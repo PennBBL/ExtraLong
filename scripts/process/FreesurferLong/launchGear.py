@@ -12,14 +12,17 @@ project = fw.projects.find_first("label=ExtraLong") #project.info says GRMPY
 
 now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
 
-fmriprep = fw.lookup('gears/fmriprep-hpc')
+fmriprep = fw.lookup('gears/fmriprep-hpc') # Q: Pick a specific version?
 
-analysis_label = "FreesurferLong_" + now.split("_")[0] + "_fMRIPrepVersion_" + fmriprep["gear"]["version"]
+analysis_label = 'FreesurferLong_{}_{}_{}'.format(now, fmriprep.gear.name,
+    fmriprep.gear.version)
 
 inputs = {"freesurfer_license": project.files[0]}
 fs_data = inputs['freesurfer_license'].read().decode()
 
-config_anatonly_longitudinal = {'longitudinal': True, 'anat_only': True, 'FREESURFER_LICENSE': fs_data}
+config_anatonly_longitudinal = {'longitudinal': True, 'anat_only': True,
+    'FREESURFER_LICENSE': fs_data, 'bold2t1w_dof': 6}
+    # April 10, 2020: last argument only necessary because there is currently an error in the manifest
 
 # Run the gear on one subject
 subjects_to_run = []
