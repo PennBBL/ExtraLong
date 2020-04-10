@@ -11,9 +11,10 @@ fw = flywheel.Client()
 project = fw.projects.find_first("label=ExtraLong") #project.info says GRMPY
 
 now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
-analysis_label = "FreesurferLong_" + now
 
 fmriprep = fw.lookup('gears/fmriprep-hpc')
+
+analysis_label = "FreesurferLong_" + now.split("_")[0] + "_fMRIPrepVersion_" + fmriprep["gear"]["version"]
 
 inputs = {"freesurfer_license": project.files[0]}
 fs_data = inputs['freesurfer_license'].read().decode()
