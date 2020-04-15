@@ -12,7 +12,7 @@ project = fw.projects.find_first("label=ExtraLong") #project.info says GRMPY
 
 now = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M")
 
-fmriprep = fw.lookup('gears/fmriprep-hpc') # Q: Pick a specific version?
+fmriprep = fw.lookup('gears/fmriprep-hpc/0.3.2_20.0.5') # Latest version as of April 10, 2020
 
 analysis_label = 'FreesurferLong_{}_{}_{}'.format(now, fmriprep.gear.name,
     fmriprep.gear.version)
