@@ -1,7 +1,7 @@
 ### Launch freesurfer longitudinal gear to CUBIC
 ###
 ### Ellyn Butler
-### April 22, 2020 - April 27, 2020
+### April 22, 2020 - May 15, 2020
 
 import flywheel
 import datetime
@@ -18,17 +18,19 @@ analysis_label = 'FreesurferCross_{}_{}_{}'.format(now, fmriprep.gear.name,
     fmriprep.gear.version)
 
 inputs = {"freesurfer_license": project.files[0]}
-fs_data = inputs['freesurfer_license'].read().decode() #May be a problem
+fs_data = inputs['freesurfer_license'].read().decode() # May not be necessary
 
 config_anatonly_cross = {'longitudinal': False, 'anat_only': True,
     'FREESURFER_LICENSE': fs_data, 'bold2t1w_dof': 6}
-    # April 10, 2020: last argument only necessary because there is currently an error in the manifest
+    # April 10, 2020: last argument only necessary because there is currently an
+    # error in the way the manifest is being parsed
 
 analysis_ids = []
 fails = []
 sessions_to_run = project.sessions()
 
-sessions_to_run = sessions_to_run[1:200] #0:200
+sessions_to_run = sessions_to_run[1600:1800]
+#0:200, 200:400, 400:600, 600:800, 800:1000, 1000:1200, 1200:1400, 1400:1600
 
 for ses in sessions_to_run:
     try:
@@ -39,7 +41,33 @@ for ses in sessions_to_run:
         print(e)
         fails.append(ses)
 
-jobs = fw.jobs.find('state=pending,gear_info.name="fmriprep-hpc",destination.type="analysis"', limit=50)
+#jobs = fw.jobs.find('state=pending,gear_info.name="fmriprep-hpc",destination.type="analysis"', limit=200)
 
-for job in fw.jobs.iter_find('state=pending'):
-    print('Job: {}, Gear: {}'.format(job.id, job.gear_info.name))
+jobs = fw.get_current_user_jobs(gear='fmriprep-hpc')
+jobs['stats']
+
+#for job in fw.jobs.iter_find('state=pending'):
+#    print('Job: {}, Gear: {}'.format(job.id, job.gear_info.name))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Get analysis id for a failed job
+failedjobs = {}
+jobs['jobs'][200]
+for job in jobs['jobs']:
+    if job['gear_info']['version'] == '0.3.4_20.0.5' and job['state'] == 'failed':
+        for file in job['saved_files']:
+            if 'ses-PNC1' in file and 'nii.gz' in file:
+                failedjobs[file] = job['_id']
+                break

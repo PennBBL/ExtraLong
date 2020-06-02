@@ -1,4 +1,5 @@
-### This script downloads freesurfer output from fMRIPrep runs
+### This script attaches freesurfer output from fMRIPrep runs as an object
+### in the config of a freesurfer-quality-calc run
 ###
 ### Ellyn Butler
 ### May 4, 2020 - May 5, 2020
@@ -19,17 +20,17 @@ sessions = [fw.get(x.id) for x in sessions]
 
 # This function loops through the analyses of a session, checks if `fmriprep`
 # ran successfully, and returns the most recent successful `fmriprep` analysis.
-def get_latest_fmriprep_correctversion(session):
+def get_latest_fmriprep_correctversion(session, fmriprepVersion):
     if session.analyses:
         timezone = pytz.timezone("UTC")
         init_date = datetime.datetime(2018, 1, 1)
         latest_date = timezone.localize(init_date)
         latest_run = None
 
-        for i in session.analyses:
-            gear_name = i.gear_info['name']
-            state = i.job.state
-            date = i.created
+        for analysis in session.analyses:
+            gear_name = analysis.gear_info['name']
+            state = analysis.job.state
+            date = analysis.created
             if 'fmriprep' in gear_name and date > latest_date and state =='complete':
                 latest_date = date
                 latest_run = i
@@ -61,51 +62,36 @@ d = get_freesurferfile(sessions[7])
 
 # Now, we fetch freesurfer-quality-calc
 fqc = fw.lookup('gears/freesurfer-quality-calc')
-eg = sessions[0]
+#eg = sessions[0]
 
-taskfile = get_freesurferfile(eg)
-fmriprep = get_latest_fmriprep_correctversion(eg)
-
-myconfig = {
-    'analysis_type': 'task_acompcor_alff_reho_fcon'
-}
-myinput = {
-    'fmriprepdir': fmriprep,
-    'designfile': designFile,
-    'taskfile': taskfile
-}
-    #xcp.run(analysis_label=\"XCP_SDK_CBF_{}\".format(datetime.datetime.now()), destination=eg, inputs=myinput, config=myconfig)
-    #returns the jobID
-xcp_runs = {}
+#xcp.run(analysis_label=\"XCP_SDK_CBF_{}\".format(datetime.datetime.now()), destination=eg, inputs=myinput, config=myconfig)
+#returns the jobID
+fqc_runs = {}
 for i, x in enumerate(sessions):
     ses = fw.get(x.id)
     #struc = get_latest_struct(ses)
-    fmriprep = get_latest_fmriprep(ses)
-    taskfile1 = get_taskfile(ses)
+    fmriprep = get_latest_fmriprep_correctversion(ses, "20.0.5")
 
     if  fmriprep and taskfile1:
-        myconfig = {
-            'analysis_type': 'task_acompcor_alff_reho_fcon',
-            'task_name' :'emotionid'
-        }
         myinput = {
-            'fmriprepdir': fmriprep,
-            'designfile': designFile,
-            'taskfile': taskfile1,
+            'fmriprepdir': fmriprep
         }
-        jobid = xcp.run(analysis_label=\"XCP_SDK_TASK_{}\".format(datetime.datetime.now()), destination=ses, inputs=myinput, config=myconfig)
-        xcp_runs[ses.label] = jobid
+        jobid = xcp.run(analysis_label="XCP_SDK_TASK_{}".format(datetime.datetime.now()), destination=ses, inputs=myinput)
+        fqc_runs[ses.label] = jobid
     else:
-        xcp_runs[ses.label] = None
-    import templateflow.api as tf
-    [str(tf.get('fsLR', space='fsaverage', suffix='sphere', hemi=hemi, density='164k'))
-            for hemi in 'LR']
-    import templateflow.api as tf
-    [str(tf.get('fsLR', space='fsaverage', suffix='sphere', hemi=hemi, density='164k'))
-            for hemi in 'LR']
-    [str(tf.get('fsLR', space='fsaverage', suffix='midthickness', hemi=hemi, density='164k'))
-            for hemi in 'LR']
-    str(brain_mask)
+        fqc_runs[ses.label] = None
+
+
+
+    #import templateflow.api as tf
+    #[str(tf.get('fsLR', space='fsaverage', suffix='sphere', hemi=hemi, density='164k'))
+    #        for hemi in 'LR']
+    #import templateflow.api as tf
+    #[str(tf.get('fsLR', space='fsaverage', suffix='sphere', hemi=hemi, density='164k'))
+    #        for hemi in 'LR']
+    #[str(tf.get('fsLR', space='fsaverage', suffix='midthickness', hemi=hemi, density='164k'))
+    #        for hemi in 'LR']
+    #str(brain_mask)
 
 
 
