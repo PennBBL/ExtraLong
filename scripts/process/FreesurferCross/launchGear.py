@@ -1,7 +1,7 @@
 ### Launch freesurfer longitudinal gear to CUBIC
 ###
 ### Ellyn Butler
-### April 22, 2020 - May 15, 2020
+### April 22, 2020 - July 1, 2020
 
 import flywheel
 import datetime
@@ -29,8 +29,8 @@ analysis_ids = []
 fails = []
 sessions_to_run = project.sessions()
 
-sessions_to_run = sessions_to_run[1600:1800]
-#0:200, 200:400, 400:600, 600:800, 800:1000, 1000:1200, 1200:1400, 1400:1600
+sessions_to_run = sessions_to_run[1800:2200]
+#0:200, 200:400, 400:600, 600:800, 800:1000, 1000:1200, 1200:1400, 1400:1600, 1600:1800
 
 for ses in sessions_to_run:
     try:
@@ -46,9 +46,12 @@ for ses in sessions_to_run:
 jobs = fw.get_current_user_jobs(gear='fmriprep-hpc')
 jobs['stats']
 
-#for job in fw.jobs.iter_find('state=pending'):
-#    print('Job: {}, Gear: {}'.format(job.id, job.gear_info.name))
-
+# Find sessions with no complete fmripreps version 0.3.4_20.0.5
+# sessions_to_run[0]... no analyses 'Label': 'PNC2', 'Subject': '86486'
+sessions_to_run = project.sessions()
+def run_succeeded(idnum):
+    obj = fw.get(idnum)
+    return len([f for f in obj.files if f.name.beginswith('FreesurferCross')]) > 0
 
 
 
