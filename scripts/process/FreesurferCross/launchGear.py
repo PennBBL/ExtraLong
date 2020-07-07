@@ -29,8 +29,8 @@ analysis_ids = []
 fails = []
 sessions_to_run = project.sessions()
 
-sessions_to_run = sessions_to_run[1800:2200]
-#0:200, 200:400, 400:600, 600:800, 800:1000, 1000:1200, 1200:1400, 1400:1600, 1600:1800
+sessions_to_run = sessions_to_run[2200:2341]
+#0:200, 200:400, 400:600, 600:800, 800:1000, 1000:1200, 1200:1400, 1400:1600, 1600:1800, 1800:2200
 
 for ses in sessions_to_run:
     try:
@@ -46,26 +46,36 @@ for ses in sessions_to_run:
 jobs = fw.get_current_user_jobs(gear='fmriprep-hpc')
 jobs['stats']
 
-# Find sessions with no complete fmripreps version 0.3.4_20.0.5
+
+######## Find sessions with no complete fmripreps version 0.3.4_20.0.5 #######
+
 # sessions_to_run[0]... no analyses 'Label': 'PNC2', 'Subject': '86486'
-sessions_to_run = project.sessions()
-def run_succeeded(idnum):
-    obj = fw.get(idnum)
-    return len([f for f in obj.files if f.name.beginswith('FreesurferCross')]) > 0
+project = fw.lookup('bbl/ExtraLong')
+gear_name = 'fmriprep-hpc'
+gear_version = '0.3.4_20.0.5'
+sessions_to_reprocess = []
+for s in project.sessions.iter():
+    s = s.reload()   # reload is required to load the analyses attached to the session
+    match_found = False
+    for a in s.analyses:
+        if a.gear_info.name == gear_name and a.gear_info.version == gear_version and a.job.state == 'complete':
+            match_found = True
+            break
+    if not match_found:
+        sessions_to_reprocess.append(s)
 
+analysis_ids = []
+fails = []
+for ses in sessions_to_reprocess:
+    try:
+        _id = fmriprep.run(analysis_label=analysis_label,
+            config=config_anatonly_cross, inputs=inputs, destination=ses)
+        analysis_ids.append(_id)
+    except Exception as e:
+        print(e)
+        fails.append(ses)
 
-
-
-
-
-
-
-
-
-
-
-
-# Get analysis id for a failed job
+######## Get analysis id for a failed job
 failedjobs = {}
 jobs['jobs'][200]
 for job in jobs['jobs']:
