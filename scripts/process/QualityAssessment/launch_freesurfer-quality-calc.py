@@ -2,7 +2,7 @@
 ### in the config of a freesurfer-quality-calc run
 ###
 ### Ellyn Butler
-### May 4, 2020 - May 5, 2020
+### May 4, 2020 - May 5, 2020... August 18, 2020
 
 import flywheel
 import datetime
@@ -31,12 +31,13 @@ def get_latest_fmriprep_correctversion(session, fmriprepVersion):
             gear_name = analysis.gear_info['name']
             state = analysis.job.state
             date = analysis.created
-            if 'fmriprep' in gear_name and date > latest_date and state =='complete':
+            anal = analysis.label
+            if 'fmriprep' in gear_name and date > latest_date and state =='complete' and fmriprepVersion in anal:
                 latest_date = date
-                latest_run = i
+                latest_run = analysis
 
         if latest_run is not None:
-            fmriprep_out = [x for x in latest_run.files if 'fmriprep' in x.name][0]
+            fmriprep_out = [x for x in latest_run.files if 'fmriprep' in x.name and x.mimetype == 'application/zip'][0]
             fmriprep_out
             return(fmriprep_out)
         else:
@@ -46,19 +47,21 @@ def get_latest_fmriprep_correctversion(session, fmriprepVersion):
 
 
 # get freesurfer zip
-def get_freesurferfile(session):
-    for analysis in session.analyses:
-        for thisfile in analysis.files:
-            if thisfile.name.endswith('.zip') and thisfile.name.startswith('fmriprep'): #Look at analysis label version instead
-                freesurferfile = thisfile
-        else:
-            freesurferfile =  None
-    return freesurferfile
+#def get_freesurferfile(session):
+#    for analysis in session.analyses:
+#        for thisfile in analysis.files:
+#            if thisfile.name.endswith('.zip') and thisfile.name.startswith('fmriprep'): #Look at analysis label version instead
+#                freesurferfile = thisfile
+#        else:
+#            freesurferfile =  None
+#    return freesurferfile
 
 #session = sessions[7]
 #session.analyses[2].files[1].name
 
-d = get_freesurferfile(sessions[7])
+d = get_latest_fmriprep_correctversion(sessions[7], '0.3.4_20.0.5')
+
+#d = get_freesurferfile(sessions[7])
 
 # Now, we fetch freesurfer-quality-calc
 fqc = fw.lookup('gears/freesurfer-quality-calc')
@@ -70,13 +73,14 @@ fqc_runs = {}
 for i, x in enumerate(sessions):
     ses = fw.get(x.id)
     #struc = get_latest_struct(ses)
-    fmriprep = get_latest_fmriprep_correctversion(ses, "20.0.5")
+    fmriprep = get_latest_fmriprep_correctversion(ses, '0.3.4_20.0.5')
 
-    if  fmriprep and taskfile1:
+    if  fmriprep:
         myinput = {
-            'fmriprepdir': fmriprep
+            'fmriprepdir': fmriprep,
+            'session_label': ses.label
         }
-        jobid = xcp.run(analysis_label="XCP_SDK_TASK_{}".format(datetime.datetime.now()), destination=ses, inputs=myinput)
+        jobid = xcp.run(analysis_label="freesurfer-quality-calc_{}".format(datetime.datetime.now()), destination=ses, inputs=myinput)
         fqc_runs[ses.label] = jobid
     else:
         fqc_runs[ses.label] = None
