@@ -60,6 +60,8 @@ subj = subjects[0]
 sublabel = subj['label']
 #if not os.path.exists(fmriprepdir+sublabel):
 #    os.mkdir(fmriprepdir+sublabel)
+
+i=1
 for ses in subj.sessions():
     ses = ses.reload()
     d = get_latest_fmriprep_correctversion(ses, '0.3.4_20.0.5')
@@ -86,27 +88,32 @@ for ses in subj.sessions():
                     notsubdirfiles.append(dI)
             # Move contents of session-specific fmriprep dir to a session directory
             # within the fmriprep-created subject directory.
+            sesdir = outdir+iddir+'/'+processeddir+'/'+sublabel+'/'+seslabel
             os.mkdir(source+'/'+subdir+'/'+seslabel)
             for file in notsubdirfiles:
-                shutil.move(f"{source}/{file}", outdir+iddir+'/'+processeddir+'/'+sublabel+'/'+seslabel)
+                shutil.move(f"{source}/{file}", sesdir)
             # Move anat and figures into ses dir
             for dI in os.listdir(outdir+iddir+'/'+processeddir+'/'+subdir):
                 if not 'ses-' in dI:
-                    shutil.move(f"{source}/{dI}", outdir+iddir+'/'+processeddir+'/'+sublabel+'/'+seslabel)
-            # Collapse directories
-            if processeddir == 'fmriprep':
-                # Move this sub*/ses* directory into the fmriprep directory that I
-                # created
+                    shutil.move(f"{source+'/'+sublabel}/{dI}", sesdir)
+            # Rename all of the files with the sub label to include the ses label
+            for path, subdirs, files in os.walk(sesdir):
+                for name in files:
+                    if sublabel in name:
+                        newname = name.replace(sublabel, sublabel+'_'+seslabel)
+                        shutil.move(os.path.join(path, name), os.path.join(path, newname))
+            # Move this sub*/ses* directory into the fmriprep directory that I created
+            subdir = outdir+iddir+'/'+processeddir+'/'+sublabel
+            if i == 1:
+                shutil.move(subdir, outdir+processeddir)
             else:
+                shutil.move(sesdir, outdir+processeddir+'/'+sublabel)
                 # Move the contents of ses dir into the fmriprep ses dir
             # Delete the directory with the analysis ID as the name
             os.rmdir(source)
-        os.remove(outdir+sublabel+'/'+seslabel+'/'+filename)
-    if not :
-        # Rename fmriprep output to include the session label
-        fmriprep_files = os.listdir()
-    if not os.path.exists(outdir+sublabel+'/'+seslabel):
-        os.mkdir(outdir+sublabel+'/'+seslabel)
+        os.remove(outdir+filename)
+        os.rmdir(outdir+iddir)
+    i=i+1
 
 
 
