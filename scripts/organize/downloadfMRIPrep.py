@@ -58,7 +58,7 @@ if not os.path.exists(outdir+'freesurfer'):
     os.mkdir(outdir+'freesurfer')
 
 
-for subj in subjects[0:2]: #########
+for subj in subjects: ######### Will take a lot of time for a lot of subjects!
     sublabel = subj['label']
     if not os.path.exists(outdir+'fmriprep/'+sublabel):
         os.mkdir(outdir+'fmriprep/'+sublabel)
