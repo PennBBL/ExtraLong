@@ -19,8 +19,8 @@ import numpy as np
 
 
 
-outdir = '/Users/butellyn/Documents/ExtraLong/data/freesurferCrossSectional/'
-
+#outdir = '/Users/butellyn/Documents/ExtraLong/data/freesurferCrossSectional/'
+outdir = '/project/ExtraLong/data/freesurferCrossSectional/' # Path on PMACS
 
 fw = flywheel.Client()
 proj = fw.lookup('bbl/ExtraLong')
