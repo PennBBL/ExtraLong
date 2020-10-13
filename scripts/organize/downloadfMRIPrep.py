@@ -35,7 +35,6 @@ def get_latest_fmriprep_correctversion(session, fmriprepVersion):
         init_date = datetime.datetime(2018, 1, 1)
         latest_date = timezone.localize(init_date)
         latest_run = None
-
         for analysis in session.analyses:
             gear_name = analysis.gear_info['name']
             state = analysis.job.state
