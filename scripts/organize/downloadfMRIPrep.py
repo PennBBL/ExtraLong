@@ -67,9 +67,9 @@ for subj in subjects: ######### Will take a lot of time for a lot of subjects!
         ses = ses.reload()
         d = get_latest_fmriprep_correctversion(ses, '0.3.4_20.0.5')
         # Get file name
-        filename = [s for s in d['job']['saved_files'] if 'fmriprep_sub-' in s]
         seslabel = ses['label']
         try:
+            filename = [s for s in d['job']['saved_files'] if 'fmriprep_sub-' in s]
             filename = filename[0]
             # Check if the fmriprep and freesurfer dirs are already in the ses dir
             if not os.path.exists(outdir+'fmriprep/'+sublabel+'/'+seslabel):
