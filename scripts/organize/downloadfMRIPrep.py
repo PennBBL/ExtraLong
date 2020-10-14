@@ -69,7 +69,7 @@ for subj in subjects: ######### Will take a lot of time for a lot of subjects!
         # Get file name
         filename = [s for s in d['job']['saved_files'] if 'fmriprep_sub-' in s]
         seslabel = ses['label']
-        if filename is not None:
+        try:
             filename = filename[0]
             # Check if the fmriprep and freesurfer dirs are already in the ses dir
             if not os.path.exists(outdir+'fmriprep/'+sublabel+'/'+seslabel):
@@ -120,5 +120,5 @@ for subj in subjects: ######### Will take a lot of time for a lot of subjects!
                     os.rmdir(source)
                 os.remove(outdir+filename)
                 os.rmdir(outdir+iddir)
-            else:
-                print(sublabel+' '+seslabel+' '+filename)
+        except AttributeError:
+            print(sublabel+' '+seslabel+' '+filename)
