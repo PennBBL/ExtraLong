@@ -2,22 +2,34 @@
 ### and creates the output directory structure for freeqc on PMACS.
 ###
 ### Ellyn Butler
-### October 15, 2020
+### October 15, 2020 - October 16, 2020
 
 import os
 import shutil
 import re
+import logging
 
 indir = '/project/ExtraLong/data/freesurferCrossSectional/freesurfer/'
-outdir = '/project/ExtraLong/freesurferCrossSectional/freeqc/'
+outdir = '/project/ExtraLong/data/freesurferCrossSectional/freeqc/'
+subcol = 'bblid'
+freelic = '/project/ExtraLong/data/license.txt'
 
 for subj in os.listdir(indir):
-    os.mkdir(outdir+subj)
+    if not os.path.exists(outdir+subj):
+        os.mkdir(outdir+subj)
     for ses in os.listdir(indir+subj):
-        os.mkdir(outdir+subj+'/'+ses)
-        os.system('echo singularity run --cleanenv -e SUBCOL="bblid" -e SUBNAME='+subj+' -e SESNAME='+ses+' \
-            -v '+indir+subj+'/'+ses+':/input/data \
-            -v /project/ExtraLong/data/license.txt:/input/license/license.txt \
-            -v '+outdir+subj+'/'+ses':/output \
-            /project/ExtraLong/images/pennbbl/freeqc:0.0.2 > 'outdir+subj+'/'+ses+'/'+subj+'_'+ses+'_freeqc.sh')
-        os.system('qsub '+outdir+subj+'/'+ses+'/'+subj+'_'+ses+'_freeqc.sh')
+        if not os.path.exists(outdir+subj+'/'+ses):
+            os.mkdir(outdir+subj+'/'+ses)
+        #logging.basicConfig(level=logging.INFO)
+        #logger = logging.getLogger('freeqc')
+        #logger.info("=======: FreeQC :=======")
+        ses_indir = indir+subj+'/'+ses
+        ses_outdir = outdir+subj+'/'+ses
+        cmd = ['SINGULARITYENV_SUBCOL='+subcol, 'SINGULARITYENV_SUBNAME='+subj,
+            'SINGULARITYENV_SESNAME='+ses, 'singularity', 'run', '--cleanenv',
+            '-B', ses_indir+':/input/data', '-B', freelic+':/input/license/license.txt',
+            '-B', ses_outdir+':/output', '/project/ExtraLong/images/freeqc_0.0.2.sif']
+        #logger.info(' '.join(cmd))
+        freeqc_script = ses_outdir+'/freeqc_run.sh'
+        os.system('echo '+' '.join(cmd)+' > '+freeqc_script)
+        os.system('bsub '+freeqc_script)
