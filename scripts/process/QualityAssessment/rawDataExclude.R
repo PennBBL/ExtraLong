@@ -1,14 +1,28 @@
-### This script combines t1RawDataExclude variables across projects
+### This script merges the hand QA that has been performed for a few studies
+### together with all of the subject identifiers to figure out how many scans
+### have not been manually reviewed.
 ###
 ### Ellyn Butler
-### April 20, 2020 - April 28, 2020
+### October 15, 2020
 
 
-seslabel_df <- read.csv("~/Documents/ExtraLong/data/organize/scanid_to_seslabel_10-16-2019.csv")
-pnc_df <- read.csv("~/Documents/ExtraLong/data/QA/n2416_t1QaData_20170516.csv")
-#grmpy_df <- read.csv("~/Documents/ExtraLong/data/QA/n118_structQAFlags_20171103.csv")
-reward_df <- read.csv("~/Documents/ExtraLong/data/QA/n489_reward_QAFlags_Structural_final.csv")
+grmpy <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/n231_GRMPY_manualQA_20200728_needsSCANID.csv')
+#reward <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/n489_reward_QAFlags_Structural_final.csv')
+pnc <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/n2416_t1QaData_20170516.csv')
+extralong <- read.csv('~/Documents/ExtraLong/data/demographicsClinical/scanid_to_seslabel_demo_20200531.csv')
 
-##### Just identifiers and t1RawDataExclude #####
-pnc_df <- pnc_df[,c("bblid", "scanid", "t1RawDataExclude")]
-reward_df <- grmpy_df[,c("bblid", "scanid", "ManualRating")]
+# grmpy: rating
+# reward: (only done manually after flagging)
+# pnc: averageManualRating
+
+grmpy <- grmpy[, c('bblid', 'scanid', 'rating')]
+pnc <- pnc[, c('bblid', 'scanid', 'averageManualRating')]
+names(pnc) <- c('bblid', 'scanid', 'rating')
+
+qa_df <- rbind(grmpy, pnc)
+qa_df <- merge(qa_df, extralong)
+
+qa_df$rawT1Exclude <- ifelse(qa_df$rating < 1, TRUE, FALSE)
+qa_df <- qa_df[, c('bblid', 'scanid', 'seslabel', 'rawT1Exclude')]
+
+write.csv(qa_df, '~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings.csv', row.names=FALSE)
