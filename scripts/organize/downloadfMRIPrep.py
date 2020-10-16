@@ -121,4 +121,4 @@ for subj in subjects: ######### Will take a lot of time for a lot of subjects!
                 os.remove(outdir+filename)
                 os.rmdir(outdir+iddir)
         except TypeError:
-            print(sublabel+' '+seslabel+' '+filename)
+            print(sublabel+' '+seslabel)
