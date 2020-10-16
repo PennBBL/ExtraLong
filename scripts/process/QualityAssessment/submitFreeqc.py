@@ -28,8 +28,13 @@ for subj in os.listdir(indir):
         cmd = ['SINGULARITYENV_SUBCOL='+subcol, 'SINGULARITYENV_SUBNAME='+subj,
             'SINGULARITYENV_SESNAME='+ses, 'singularity', 'run', '--cleanenv',
             '-B', ses_indir+':/input/data', '-B', freelic+':/input/license/license.txt',
-            '-B', ses_outdir+':/output', '/project/ExtraLong/images/freeqc_0.0.2.sif']
+            '-B', ses_outdir+':/output', '/project/ExtraLong/images/freeqc_0.0.3.sif']
         #logger.info(' '.join(cmd))
         freeqc_script = ses_outdir+'/freeqc_run.sh'
         os.system('echo '+' '.join(cmd)+' > '+freeqc_script)
         os.system('bsub '+freeqc_script)
+
+
+# Don't mount home to singularity
+# 1. "singularity run as specific user"
+# 2. Fake root
