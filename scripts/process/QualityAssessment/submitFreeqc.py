@@ -26,12 +26,13 @@ for subj in os.listdir(indir):
         ses_indir = indir+subj+'/'+ses
         ses_outdir = outdir+subj+'/'+ses
         cmd = ['SINGULARITYENV_SUBCOL='+subcol, 'SINGULARITYENV_SUBNAME='+subj,
-            'SINGULARITYENV_SESNAME='+ses, 'singularity', 'run', '--cleanenv',
+            'SINGULARITYENV_SESNAME='+ses, 'singularity', 'run', '--writable-tmpfs', '--cleanenv',
             '-B', ses_indir+':/input/data', '-B', freelic+':/input/license/license.txt',
-            '-B', ses_outdir+':/output', '/project/ExtraLong/images/freeqc_0.0.3.sif']
+            '-B', ses_outdir+':/output', '/project/ExtraLong/images/freeqc_0.0.9.sif']
         #logger.info(' '.join(cmd))
         freeqc_script = ses_outdir+'/freeqc_run.sh'
         os.system('echo '+' '.join(cmd)+' > '+freeqc_script)
+        os.system('chmod +x '+freeqc_script)
         os.system('bsub '+freeqc_script)
 
 
