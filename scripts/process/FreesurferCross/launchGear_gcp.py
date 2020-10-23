@@ -25,21 +25,6 @@ config_anatonly_cross = {'longitudinal': False, 'anat_only': True,
     # April 10, 2020: last argument only necessary because there is currently an
     # error in the way the manifest is being parsed
 
-analysis_ids = []
-fails = []
-sessions_to_run = project.sessions()
-
-sessions_to_run = sessions_to_run[2200:2341]
-#0:200, 200:400, 400:600, 600:800, 800:1000, 1000:1200, 1200:1400, 1400:1600, 1600:1800, 1800:2200
-
-for ses in sessions_to_run:
-    try:
-        _id = fmriprep.run(analysis_label=analysis_label,
-            config=config_anatonly_cross, inputs=inputs, destination=ses)
-        analysis_ids.append(_id)
-    except Exception as e:
-        print(e)
-        fails.append(ses)
 
 #jobs = fw.jobs.find('state=pending,gear_info.name="fmriprep-hpc",destination.type="analysis"', limit=200)
 

@@ -20,16 +20,12 @@ for subj in os.listdir(indir):
     for ses in os.listdir(indir+subj):
         if not os.path.exists(outdir+subj+'/'+ses):
             os.mkdir(outdir+subj+'/'+ses)
-        #logging.basicConfig(level=logging.INFO)
-        #logger = logging.getLogger('freeqc')
-        #logger.info("=======: FreeQC :=======")
         ses_indir = indir+subj+'/'+ses
         ses_outdir = outdir+subj+'/'+ses
         cmd = ['SINGULARITYENV_SUBCOL='+subcol, 'SINGULARITYENV_SUBNAME='+subj,
             'SINGULARITYENV_SESNAME='+ses, 'singularity', 'run', '--writable-tmpfs', '--cleanenv',
             '-B', ses_indir+':/input/data', '-B', freelic+':/input/license/license.txt',
             '-B', ses_outdir+':/output', '/project/ExtraLong/images/freeqc_0.0.9.sif']
-        #logger.info(' '.join(cmd))
         freeqc_script = ses_outdir+'/freeqc_run.sh'
         os.system('echo '+' '.join(cmd)+' > '+freeqc_script)
         os.system('chmod +x '+freeqc_script)
