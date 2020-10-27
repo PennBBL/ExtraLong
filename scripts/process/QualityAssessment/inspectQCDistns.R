@@ -43,11 +43,18 @@ pdf(file='~/Documents/ExtraLong/plots/corROC.pdf', width=10, height=5)
 ggarrange(man_plot, roc_plot, ncol=2)
 dev.off()
 
+# AUC
+roc_info$holes_total
+roc_info$cnr_graycsf_lh
+
 # Based on inspection of the plots, the following cutoff was selected:
 # Holes >= 120
 # Given the low AUC for CNR, only number of holes will be utilized
 
 max(roc_info$holes_total$thresholds[which(roc_info$holes_total$sensitivities > 0.95)])
+
+min(roc_info$holes_total$sensitivities[which(roc_info$holes_total$sensitivities > 0.95)])
+max(roc_info$holes_total$specificities[which(roc_info$holes_total$sensitivities > 0.95)])
 
 # Export bblids and seslabels for scans that need to be manually reviewed
 rev_df <- quality_df[!(quality_df$bblid %in% manual_df$bblid) &
