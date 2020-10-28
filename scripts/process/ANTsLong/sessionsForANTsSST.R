@@ -36,4 +36,4 @@ quality_df2$antssstExclude <- sapply(1:nrow(quality_df2), finalExclude) # 64 exc
 
 quality_df2 <- quality_df2[, c('bblid', 'seslabel', 'antssstExclude')]
 
-write.csv(quality_df2, file='~/Documents/ExtraLong/data/qualityAssessment/antssstExclude.csv')
+write.csv(quality_df2, file='~/Documents/ExtraLong/data/qualityAssessment/antssstExclude.csv', row.names=FALSE)
