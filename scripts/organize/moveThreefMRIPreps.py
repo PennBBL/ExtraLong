@@ -9,7 +9,7 @@ import shutil
 
 outdir = '/project/ExtraLong/data/freesurferCrossSectional/'
 
-subses = {'sub-117595':'ses-PNC1', 'sub-98585':'ses-PNC1'} #'sub-100278':'ses-PNC3' completed
+subses = {'sub-100278':'ses-PNC3', 'sub-117595':'ses-PNC1', 'sub-98585':'ses-PNC1'} #completed
 
 for sublabel in list(subses.keys()): ######### Will take a lot of time for a lot of subjects!
     if not os.path.exists(outdir+'fmriprep/'+sublabel):
