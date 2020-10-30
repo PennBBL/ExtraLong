@@ -51,8 +51,8 @@ row.names(many_df) <- 1:nrow(many_df)
 many_df$diff_age1to2 <- many_df$age_second - many_df$age_first
 many_df$TrioTim <- ifelse(many_df$ManufacturersModelName == 'TrioTim', TRUE, FALSE)
 
-bblid_df <- expand.grid(1:2, c('Yes', 'No'), c(TRUE, FALSE), c(TRUE, FALSE))
-names(bblid_df) <- c('sex', 'white', 'age_first_under16', 'TrioTimT2')
+bblid_df <- expand.grid(1:2, c('Yes', 'No'), c(TRUE, FALSE))
+names(bblid_df) <- c('sex', 'white', 'age_first_under16')
 
 selectbblid <- function(i) {
   sex <- bblid_df[i, 'sex']
@@ -70,17 +70,18 @@ selectbblid <- function(i) {
     bblids <- many_df[many_df$sex == sex & many_df$white == white
       & many_df$age_first_under16 == age_first_under16 & many_df$diff_age1to2 > 1, 'bblid']
   }
+  print(length(bblids))
   sample(bblids, 2, replace=FALSE)
 }
 
 bblid_df[, c('bblid1', 'bblid2')] <- t(sapply(1:nrow(bblid_df), selectbblid))
 
-bblids <- c(bblid_df$bblid1, bblid_df$bblid2)
-
 
 # Create dataframe of bblids and seslabels for bblids selected and their first
 # through third sessions
-template_df <- demo_df[demo_df$bblid %in% bblids & demo_df$timepoint %in% 1:2, ]
+template_df <- demo_df[demo_df$bblid %in% c(bblid_df$bblid1, bblid_df$bblid2) & demo_df$timepoint %in% 1:2, ]
+
+# 18.75% of the template sample is Prismas, while 10.17% of the total sample are
 
 # Sanity checks on balance
 mean(template_df[template_df$sex == 1, 'age_first'])
@@ -89,13 +90,13 @@ mean(template_df[template_df$white == 'Yes', 'age_first'])
 mean(template_df[template_df$white == 'No', 'age_first'])
 
 mean(template_df[template_df$sex == 1, 'age_second'])
-mean(template_df[template_df$sex == 2, 'age_second])
+mean(template_df[template_df$sex == 2, 'age_second'])
 mean(template_df[template_df$white == 'Yes', 'age_second'])
 mean(template_df[template_df$white == 'No', 'age_second'])
 
 
 
-
+write.csv(template_df[, c('bblid', 'seslabel')], '~/Documents/ExtraLong/data/groupTemplates/subjsFromN752.csv', row.names=FALSE)
 
 
 
