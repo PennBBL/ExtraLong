@@ -25,4 +25,8 @@ qa_df <- merge(qa_df, extralong)
 qa_df$rawT1Exclude <- ifelse(qa_df$rating < 1, TRUE, FALSE)
 qa_df <- qa_df[, c('bblid', 'scanid', 'seslabel', 'rawT1Exclude')]
 
+###### CHANGE rawT1Exclude for clearly bad images identified by chance ######
+qa_df[qa_df$bblid == 117595 & qa_df$seslabel == 'PNC1', 'rawT1Exclude'] <- TRUE
+# ^ rating was 1.667... WHY SO HIGH???
+
 write.csv(qa_df, '~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings.csv', row.names=FALSE)

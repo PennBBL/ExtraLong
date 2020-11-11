@@ -1,18 +1,25 @@
 ### This script determines which sessions should go through antssst
 ###
 ### Ellyn Butler
-### October 23, 2020
+### October 23, 2020 - November 10, 2020
 
-quality_df <- read.csv('~/Documents/ExtraLong/data/freesurferCrossSectional/tabulated/quality_2020-10-22.csv')
-exclude_df <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings.csv')
+quality_df <- read.csv('~/Documents/ExtraLong/data/freesurferCrossSectional/tabulated/quality_2020-11-09.csv')
+excludeTrunc_df <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_trunc.csv')
+excludeRev_df <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_revised.csv')
 excludeMore_df <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_ERB.csv')
 
 quality_df <- quality_df[, c('bblid', 'seslabel')]
 
 exclude_df <- exclude_df[, c('bblid', 'seslabel', 'rawT1Exclude')]
-exclude_df <- exclude_df[exclude_df$bblid %in% quality_df$bblid, ]
+#exclude_df <- exclude_df[exclude_df$bblid %in% quality_df$bblid, ]
 
 excludeMore_df$rawT1Exclude <- ifelse(excludeMore_df$rating < 1, TRUE, FALSE)
+
+# Get the number of 0s, 1s and 2s in excludeMore_df for wiki
+nrow(excludeMore_df[excludeMore_df$rating == 0, ])
+nrow(excludeMore_df[excludeMore_df$rating == 1, ])
+nrow(excludeMore_df[excludeMore_df$rating == 2, ])
+
 excludeMore_df <- excludeMore_df[, c('bblid', 'seslabel', 'rawT1Exclude')]
 
 exclude_df2 <- merge(excludeMore_df, exclude_df, all=TRUE)
@@ -33,6 +40,12 @@ finalExclude <- function(i) {
 }
 
 quality_df2$antssstExclude <- sapply(1:nrow(quality_df2), finalExclude) # 64 excluded in total
+
+# Get the number excluded based on very poor quality
+sum(quality_df2$rawT1Exclude)
+
+# Get the number excluded based on being a singleton
+sum(quality_df2$antssstExclude) - sum(quality_df2$rawT1Exclude)
 
 quality_df2 <- quality_df2[, c('bblid', 'seslabel', 'antssstExclude')]
 

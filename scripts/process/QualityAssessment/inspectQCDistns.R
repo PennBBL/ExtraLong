@@ -8,7 +8,15 @@ library(ggpubr) #V 0.4.0
 library(pROC) #V 1.16.2
 
 manual_df <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings.csv')
-quality_df <- read.csv('~/Documents/ExtraLong/data/freesurferCrossSectional/tabulated/quality_2020-10-22.csv')
+quality_df <- read.csv('~/Documents/ExtraLong/data/freesurferCrossSectional/tabulated/quality_2020-11-09.csv')
+
+quality_df <- quality_df[!is.na(quality_df$holes_total), ]
+# November 9, 2020: Get rid of sub-98585_ses-PNC1 because didn't fully get
+# through freesurfer after multiple tries, and the image quality is really bad
+# (by visual inspection by me and someone else in the past), so I just gave up
+quality_df$holes_rh <- as.numeric(as.character(quality_df$holes_rh))
+quality_df$euler_rh <- as.numeric(as.character(quality_df$euler_lh))
+
 
 final_df <- merge(manual_df, quality_df, all=TRUE)
 
@@ -56,13 +64,16 @@ max(roc_info$holes_total$thresholds[which(roc_info$holes_total$sensitivities > 0
 min(roc_info$holes_total$sensitivities[which(roc_info$holes_total$sensitivities > 0.95)])
 max(roc_info$holes_total$specificities[which(roc_info$holes_total$sensitivities > 0.95)])
 
+
 # Export bblids and seslabels for scans that need to be manually reviewed
-rev_df <- quality_df[!(quality_df$bblid %in% manual_df$bblid) &
+manual_df$bblid_seslabel <- paste(manual_df$bblid, manual_df$seslabel, sep='_')
+quality_df$bblid_seslabel <- paste(quality_df$bblid, quality_df$seslabel, sep='_')
+rev_df <- quality_df[!(quality_df$bblid_seslabel %in% manual_df$bblid_seslabel) &
   quality_df$holes_total >= 120, c('bblid', 'seslabel')]
 
 rev_df$rating <- ''
 
-write.csv(rev_df, file='~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_ERB.csv', row.names=FALSE)
+write.csv(rev_df, file='~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_ERB2.csv', row.names=FALSE)
 
 
 
