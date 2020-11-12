@@ -10,10 +10,11 @@ excludeMore_df <- read.csv('~/Documents/ExtraLong/data/qualityAssessment/rawManu
 
 quality_df <- quality_df[, c('bblid', 'seslabel')]
 
-exclude_df <- exclude_df[, c('bblid', 'seslabel', 'rawT1Exclude')]
-#exclude_df <- exclude_df[exclude_df$bblid %in% quality_df$bblid, ]
-
+excludeRev_df$rawT1Exclude <- ifelse(excludeRev_df$rating < 1, TRUE, FALSE)
 excludeMore_df$rawT1Exclude <- ifelse(excludeMore_df$rating < 1, TRUE, FALSE)
+
+excludeRev_df <- excludeRev_df[, c('bblid', 'seslabel', 'rawT1Exclude')]
+excludeTrunc_df <- excludeTrunc_df[, c('bblid', 'seslabel', 'rawT1Exclude')]
 
 # Get the number of 0s, 1s and 2s in excludeMore_df for wiki
 nrow(excludeMore_df[excludeMore_df$rating == 0, ])
@@ -22,8 +23,10 @@ nrow(excludeMore_df[excludeMore_df$rating == 2, ])
 
 excludeMore_df <- excludeMore_df[, c('bblid', 'seslabel', 'rawT1Exclude')]
 
-exclude_df2 <- merge(excludeMore_df, exclude_df, all=TRUE)
+exclude_df2 <- merge(excludeMore_df, excludeTrunc_df, all=TRUE)
+exclude_df2 <- merge(exclude_df2, excludeRev_df, all=TRUE)
 quality_df2 <- merge(quality_df, exclude_df2, all=TRUE)
+
 
 # If NA, that means they had very few holes, and as such did not require manual review,
 # so change NA to FALSE

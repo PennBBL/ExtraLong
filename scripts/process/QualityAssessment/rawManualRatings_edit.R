@@ -14,7 +14,7 @@ quality_df <- read.csv('~/Documents/ExtraLong/data/freesurferCrossSectional/tabu
 exclude_df <- merge(exclude_df, quality_df)
 exclude_df <- exclude_df[!is.na(exclude_df$holes_total), ]
 excludeTrunc_df <- exclude_df[exclude_df$holes_total <= 250, ]
-excludeRev_df <- exclude_df[exclude_df$holes_total > 250, ]
+excludeRev_df <- exclude_df[exclude_df$holes_total > 250, ] # OOPS: SHOULD HAVE ONLY BEEN ONES THAT WERE PREVIOUSlY INCLUDED... looked at too many images
 
 excludeTrunc_df <- excludeTrunc_df[, c('bblid', 'seslabel', 'rawT1Exclude')]
 write.csv(excludeTrunc_df, file='~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_trunc.csv', row.names=FALSE)
@@ -22,4 +22,4 @@ write.csv(excludeTrunc_df, file='~/Documents/ExtraLong/data/qualityAssessment/ra
 excludeRev_df <- excludeRev_df[, c('bblid', 'seslabel')]
 excludeRev_df$rating <- ''
 excludeRev_df$notes <- ''
-write.csv(excludeRev_df, file='~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_revised.csv', row.names=FALSE)
+write.csv(excludeRev_df, file='~/Documents/ExtraLong/data/qualityAssessment/rawManualRatings_revised2.csv', row.names=FALSE)
