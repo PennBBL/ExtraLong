@@ -13,8 +13,11 @@ prepdir = '/project/ExtraLong/data/freesurferCrossSectional/fmriprep/'
 sstdir = '/project/ExtraLong/data/singleSubjectTemplates/antssst/'
 outdir = '/project/ExtraLong/data/groupTemplates/versionOne/'
 
+if not os.path.isdir(outdir):
+    os.mkdir(outdir)
+
 # Load csv of subjects and sessions to include in SSTs
-dat = pd.read_csv(outdir+'subjsFromN752.csv')
+dat = pd.read_csv('/project/ExtraLong/data/groupTemplates/subjsFromN752_set1.csv')
 dat['bblid'] = dat.bblid.astype(str)
 
 dataToBind = ''
