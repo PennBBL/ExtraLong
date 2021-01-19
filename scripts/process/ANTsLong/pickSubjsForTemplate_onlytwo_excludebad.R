@@ -4,7 +4,7 @@
 ### directly.
 ###
 ### Ellyn Butler
-### December 7, 2020
+### December 7, 2020 - January 12, 2021
 
 set.seed(20)
 
@@ -25,9 +25,9 @@ demo_df <- demo_df[demo_df$bblid %in% diag_df$bblid & demo_df$num_timepoints == 
 # Filter out sessions with poor quality metrics
 demo_df <- demo_df[demo_df$bblid %in% qa_df$bblid, ]
 
-# Filter out images that were problematic in set 1
+# Filter out images that were problematic in set 1 and set 2
 demo_df <- demo_df[!(demo_df$bblid %in% c('93517', '101299', '113340', '122732',
-  '87346', '91717', '94144', '98425')), ]
+  '87346', '91717', '94144', '98425', '86126', '88209', '93746')), ] #Might try again: 113340
 
 demo_df <- merge(demo_df, param_df)
 
@@ -100,7 +100,7 @@ mean(template_df[template_df$white == 'No', 'age_second'])
 
 
 
-write.csv(template_df[, c('bblid', 'seslabel')], '~/Documents/ExtraLong/data/groupTemplates/subjsFromN752_set2.csv', row.names=FALSE)
+write.csv(template_df[, c('bblid', 'seslabel')], '~/Documents/ExtraLong/data/groupTemplates/subjsFromN752_set3.csv', row.names=FALSE)
 
 
 
