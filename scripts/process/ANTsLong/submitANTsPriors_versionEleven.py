@@ -2,16 +2,16 @@
 ### pairs in a csv) and calls antspriors to create a group template and priors
 ###
 ### Ellyn Butler
-### January 29 - February 1, 2021
+### February 2, 2021
 
 import os
 import shutil
 import re
 import pandas as pd
 
-prepdir = '/project/ExtraLong/data/freesurferCrossSectional/fmriprep/' #CHANGE THIS TO THE PADDED IMAGES... need to pad other inputs
+prepdir = '/project/ExtraLong/data/freesurferCrossSectional/fmriprep/'
 sstdir = '/project/ExtraLong/data/singleSubjectTemplates/antssst5/'
-outdir = '/project/ExtraLong/data/groupTemplates/versionTen/'
+outdir = '/project/ExtraLong/data/groupTemplates/versionEleven/'
 
 if not os.path.isdir(outdir):
     os.mkdir(outdir)
@@ -47,18 +47,18 @@ for bblid in dat['bblid'].unique():
     dataToBind = dataToBind+'-B '+template_dir+'/'+template+':/data/input/'+template+' '
 
 # Create bind call to output directory
-dataToBind = dataToBind+'-B /project/ExtraLong/data/groupTemplates/versionTen:/data/output '
+dataToBind = dataToBind+'-B /project/ExtraLong/data/groupTemplates/versionEleven:/data/output '
 
 # Bind the mindboggle images
-dataToBind = dataToBind+'-B /project/ExtraLong/data/mindboggle/dataverse_files:/data/input/dataverse_files '
+dataToBind = dataToBind+'-B /project/ExtraLong/data/mindboggle/dataverse_files:/data/input/dataverse_files'
 
 # Bind MNI
-dataToBind = dataToBind+'-B /project/ExtraLong/data/mni/MNI-1x1x1Head.nii.gz:/data/input/MNI-1x1x1Head.nii.gz'
+#dataToBind = dataToBind+'-B /project/ExtraLong/data/mni/MNI-1x1x1Head.nii.gz:/data/input/MNI-1x1x1Head.nii.gz'
 
 cmd = ['SINGULARITYENV_projectName=ExtraLong', 'singularity', 'exec',
         '--writable-tmpfs', '--cleanenv', dataToBind,
-        '/project/ExtraLong/images/antspriors_0.0.13.sif', '/scripts/run.sh']
+        '/project/ExtraLong/images/antspriors_0.0.15.sif', '/scripts/run.sh']
 antspriors_script = outdir+'antspriors_run.sh'
 os.system('echo '+' '.join(cmd)+' > '+antspriors_script)
 os.system('chmod +x '+antspriors_script)
-os.system('bsub -o '+outdir+'/jobinfo.log -n 10 '+antspriors_script)
+os.system('bsub -o '+outdir+'/jobinfo.log -n 16 '+antspriors_script)

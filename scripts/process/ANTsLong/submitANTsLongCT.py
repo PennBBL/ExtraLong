@@ -12,7 +12,7 @@ gr_indir = '/project/ExtraLong/data/groupTemplates/versionTen/'
 sst_indir = '/project/ExtraLong/data/singleSubjectTemplates/antssst5/'
 outdir = '/project/ExtraLong/data/corticalThickness/antslongct/'
 
-subjs = os.listdir(indir)
+subjs = os.listdir(sst_indir)
 
 for subj in subjs:
     if not os.path.exists(outdir+subj):
@@ -22,7 +22,7 @@ for subj in subjs:
         print('Write conditions for already being processed')
     else:
         #print(bblid+' has not previously been run through ANTsLongCT. Running for the first time now.')
-        sub_indir = indir+subj
+        sub_indir = sst_indir+subj
         sub_outdir = outdir+subj
         cmd = ['singularity', 'exec', '--writable-tmpfs', '--cleanenv',
             '-B', sub_indir+':/data/input/'+subj, '-B', gr_indir+':/data/input/versionTen',
