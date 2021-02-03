@@ -31,6 +31,37 @@ len(np.unique(sum_priors))#Oops... Not all zero and 1
 np.amax(sum_priors) #87???
 np.amin(sum_priors) # 0
 
-plt.hist(sum_priors, bins = [0,20,40,60,80,100])
-plt.title("histogram")
-plt.show()
+# Check that all of the masks that comprise the priors are binary
+masks = [mask for mask in os.listdir(basedir) if '_mask.nii.gz' in mask]
+
+for mask in masks:
+    img = nib.load(basedir+mask).get_fdata()
+    print(mask+' '+str(np.amax(img)))
+    print(mask+' '+str(np.amin(img)))
+
+# Did the warping to the standard space cause the non-binariness? Yes
+# If so, binarize the warped images and then average them
+
+# Check add up to 1 now that fixed
+np.unique(np.round(sum_priors, decimals=2))
+
+# They aren't... maybe non 0 or 1's are on the boundary of brain and background
+# Write out image to check this
+img = nib.load(basedir+'GMCortical_NormalizedtoExtraLongTemplate_averageMask.nii.gz')
+img = nib.Nifti1Image(sum_priors, affine=img.affine)
+img.to_filename(basedir+'/sumpriors.nii.gz') #EEEK. Major space problem
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
