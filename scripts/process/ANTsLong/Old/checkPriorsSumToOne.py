@@ -28,7 +28,7 @@ len(np.unique(sum_priors))#Oops... Not all zero and 1
 # How far off from 0 and 1?
 #np.histogram(sum_priors)
 
-np.amax(sum_priors) #87???
+np.amax(sum_priors) # 1
 np.amin(sum_priors) # 0
 
 # Check that all of the masks that comprise the priors are binary
