@@ -10,7 +10,10 @@ import pandas as pd
 
 gr_indir = '/project/ExtraLong/data/groupTemplates/antspriors/'
 sst_indir = '/project/ExtraLong/data/singleSubjectTemplates/antssst5/'
-outdir = '/project/ExtraLong/data/corticalThickness/antslongct/'
+outdir = '/project/ExtraLong/data/corticalThickness/antslongct2/'
+
+if not os.path.exists(outdir):
+    os.mkdir(outdir)
 
 subjs = os.listdir(sst_indir)
 
@@ -27,7 +30,7 @@ for subj in subjs:
         cmd = ['SINGULARITYENV_projectName=ExtraLong', 'SINGULARITYENV_subLabel=bblid',
             'singularity', 'run', '--writable-tmpfs', '--cleanenv',
             '-B', sub_indir+':/data/input/'+subj, '-B', gr_indir+':/data/input/antspriors/',
-            '-B', sub_outdir+':/data/output', '/project/ExtraLong/images/antslongct_0.0.3.sif']
+            '-B', sub_outdir+':/data/output', '/project/ExtraLong/images/antslongct_0.0.4.sif']
         antslongct_script = sub_outdir+'/antslongct_run.sh'
         os.system('echo '+' '.join(cmd)+' > '+antslongct_script)
         os.system('chmod +x '+antslongct_script)
