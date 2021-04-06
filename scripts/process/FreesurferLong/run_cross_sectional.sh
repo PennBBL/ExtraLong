@@ -1,10 +1,11 @@
 #!/bin/bash
 
+## TODO: edit logs dir
 export LOGS_DIR=/home/kzoner/logs/freesurfer
 
 project=/project/ExtraLong
 input_dir=${project}/data/bids_directory
-output_dir=${project}/data/FreesurferLong/cross_sectional
+output_dir=${project}/data/freesurferLongitudinal/cross_sectional
 
 mkdir -p ${project}/scripts/jobscripts/fs_jobscripts
 
@@ -35,5 +36,3 @@ for img in $imgList; do
 	#bsub -q bbl_normal -m linc1 ${jobscript}
 	bsub -e $LOGS_DIR/${subj}.e -o $LOGS_DIR/${subj}.o -q bbl_normal -m linc1 ${jobscript}
 done
-
-
