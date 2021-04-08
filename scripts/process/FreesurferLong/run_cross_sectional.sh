@@ -1,13 +1,12 @@
 #!/bin/bash
 
-## TODO: edit logs dir
-export LOGS_DIR=/home/kzoner/logs/freesurfer
+export LOGS_DIR=/home/kzoner/logs/ExtraLong/fs-cross
 
 project=/project/ExtraLong
 input_dir=${project}/data/bids_directory
 output_dir=${project}/data/freesurferLongitudinal/cross_sectional
 
-mkdir -p ${project}/scripts/jobscripts/fs_jobscripts
+mkdir -p ${project}/scripts/jobscripts/fs-cross
 
 imgList=`ls $input_dir/*/*/anat/*.nii.gz`
 
@@ -20,7 +19,7 @@ for img in $imgList; do
 	subDir=$output_dir/$subj
 	mkdir -p $subDir
 
-	jobscript=${project}/scripts/jobscripts/fs_jobscripts/${subj}_${sess}.sh
+	jobscript=${project}/scripts/jobscripts/fs-cross/${subj}_${sess}.sh
 	
 	cat <<- EOS > ${jobscript}
 		#!/bin/bash
@@ -29,10 +28,9 @@ for img in $imgList; do
 		export FREESURFER_HOME=/appl/freesurfer-7.1.1
 		source $FREESURFER_HOME/SetUpFreeSurfer.sh
 	
-		$FREESURFER_HOME/bin/recon-all -i $img -sd $subDir -s $sess -all
+		SURFER_FRONTDOOR=1 $FREESURFER_HOME/bin/recon-all -i $img -sd $subDir -s $sess -all
 	EOS
 
 	chmod +x ${jobscript}
-	#bsub -q bbl_normal -m linc1 ${jobscript}
-	bsub -e $LOGS_DIR/${subj}.e -o $LOGS_DIR/${subj}.o -q bbl_normal -m linc1 ${jobscript}
+	bsub -e $LOGS_DIR/${subj}_${sess}.e -o $LOGS_DIR/${subj}_${sess}.o ${jobscript}
 done
