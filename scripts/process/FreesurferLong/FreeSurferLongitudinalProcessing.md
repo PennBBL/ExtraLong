@@ -35,5 +35,5 @@ Provide:
 ▪ `tpNid`: session_id for timepoint _N_  
 ▪ `templateid`: name of average template for the subject, created in previous step.
 
-_This is accomplished by the second script, `make_avg_templates.sh`_
+_This is accomplished by the third script, `run_longitudinal.sh`_
 
