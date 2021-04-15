@@ -26,9 +26,9 @@ for img in $imgList; do
 		
 		module load freesurfer/7.1.1
 		export FREESURFER_HOME=/appl/freesurfer-7.1.1
-		source $FREESURFER_HOME/SetUpFreeSurfer.sh
+		source ${FREESURFER_HOME}/SetUpFreeSurfer.sh
 	
-		SURFER_FRONTDOOR=1 $FREESURFER_HOME/bin/recon-all -i $img -sd $subDir -s $sess -all
+		SURFER_FRONTDOOR=1 ${FREESURFER_HOME}/bin/recon-all -i $img -sd $subDir -s $sess -all
 	EOS
 
 	chmod +x ${jobscript}
