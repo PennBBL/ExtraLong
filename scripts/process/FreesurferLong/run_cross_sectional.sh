@@ -5,7 +5,7 @@ export LOGS_DIR=/home/kzoner/logs/ExtraLong/fs-cross
 
 project=/project/ExtraLong
 input_dir=${project}/data/bids_directory
-output_dir=${project}/data/freesurferLongitudinal/fs-cross
+output_dir=${project}/data/freesurferLongitudinal
 
 mkdir -p ${project}/scripts/jobscripts/fs-cross
 
