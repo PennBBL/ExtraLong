@@ -3,7 +3,7 @@
 export LOGS_DIR=/home/kzoner/logs/ExtraLong/fs-base
 
 project=/project/ExtraLong
-exclude_csv=${project}/data/qualityAssessment/antssstExclude.exclude_csv
+exclude_csv=${project}/data/qualityAssessment/antssstExclude.csv
 output_dir=${project}/data/freesurferLongitudinal/fs-base
 
 mkdir -p ${project}/scripts/jobscripts/fs-base
