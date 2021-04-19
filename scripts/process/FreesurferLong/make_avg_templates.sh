@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export FREESURFER_HOME=/appl/freesurfer-7.1.1
 export LOGS_DIR=/home/kzoner/logs/ExtraLong/fs-base
 
 project=/project/ExtraLong
