@@ -27,7 +27,7 @@ for subj in $subjList; do
 
         jobscript=${project}/scripts/jobscripts/fs-long/sub-${subj}_ses-${sess}.sh
 
-        cat <<- EOS > ${jobscript}
+cat <<- EOS > ${jobscript}
             #!/bin/bash
             
             module load freesurfer/7.1.1
@@ -35,9 +35,10 @@ for subj in $subjList; do
             source ${FREESURFER_HOME}/SetUpFreeSurfer.sh
             export SUBJECTS_DIR=${output_dir}/sub-${subj}
             SURFER_FRONTDOOR=1 ${FREESURFER_HOME}/bin/recon-all -long ses-${sess} Template-${subj} -all
-        EOS
-    
+EOS
+        break
         chmod +x ${jobscript}
         bsub -e $LOGS_DIR/sub-${subj}_ses-${sess}.e -o $LOGS_DIR/sub-${subj}_ses-${sess}.o ${jobscript}
     done
+    break
 done
