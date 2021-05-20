@@ -36,9 +36,8 @@ for subj in $subjList; do
 		SURFER_FRONTDOOR=1 ${FREESURFER_HOME}/bin/recon-all -long ses-${sess} Template-${subj} -all
 	EOS
 	
-	#chmod +x ${jobscript}
-	#bsub -e $LOGS_DIR/sub-${subj}_ses-${sess}.e -o $LOGS_DIR/sub-${subj}_ses-${sess}.o ${jobscript}
+	chmod +x ${jobscript}
+	bsub -e $LOGS_DIR/sub-${subj}_ses-${sess}.e -o $LOGS_DIR/sub-${subj}_ses-${sess}.o ${jobscript}
 	
 	done
-	break
 done
