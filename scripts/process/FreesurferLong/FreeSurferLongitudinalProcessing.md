@@ -24,7 +24,7 @@ Provide:\
     ▪ `templateid`: name of new average template to be created for this subject\
     ▪ `tpNid`: session_id for timepoint _N_. Pass in all tpids 1 ... _N_ for the subject. 
 
-_This is accomplished by the second script, `make_avg_templates.sh`_  
+_This is accomplished by the second script, `run_template_creation.sh`_  
 <br>
 
 ### 3. For each _session/timepoint_, longitudinally process with respect to the subject's average template using -long flag.
