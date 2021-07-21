@@ -2,5 +2,6 @@
 *plots/
 *~
 *.DS_Store*
-#*images/
+*.Rhistory
 *tissueClasses.xlsx
+*all_long_scans_oracle_cleaned.csv
