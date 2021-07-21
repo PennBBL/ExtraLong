@@ -16,13 +16,13 @@ datatypes = ['aparc_area_lh', 'aparc_area_rh', 'aparc_meancurv_lh', 'aparc_meanc
     'rh_a2009s_thickness', 'rh_a2009s_volume', 'rh_DKTatlas_area', 'rh_DKTatlas_meancurv',
     'rh_DKTatlas_thickness', 'rh_DKTatlas_volume', 'wmparc_stats']
 
-basedir = '/project/bbl_projects/ExtraLong/data'
-outdir = basedir+'/freeqc/tabulated'
+basedir = '/project/ExtraLong/data/freeqcLongitudinal'
+outdir = basedir+'/tabulated'
 
 if not os.path.exists(outdir):
     os.mkdir(outdir)
 
 for datatype in datatypes:
-    files = glob.glob(basedir+'/freeqc/sub*/ses*/*'+datatype+'.csv')
+    files = glob.glob(basedir+'/sub*/Template/*'+datatype+'.csv')
     df = pd.concat((pd.read_csv(f, header = 0) for f in files))
     df.to_csv(outdir+'/'+datatype+'_'+datetime.today().strftime('%Y-%m-%d')+'.csv', index=False)
