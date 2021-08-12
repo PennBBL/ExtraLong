@@ -37,3 +37,16 @@ Provide:
 
 _This is accomplished by the third script, `run_longitudinal.sh`_
 
+## **QC on Longitudinally-Processed Data**
+ _**Goal**: Assess the quality of the single-subject templates._
+### 4. For each subject, run `FreeQC` on the average template (SST) created in step two of the longitudinal processing stream.
+```
+SINGULARITYENV_SURFER_FRONTDOOR=1 \
+    singularity run --writable-tmpfs --cleanenv \
+    -B <path_to_Template-*_dir>:/input/data \
+    -B <path_to_license>:/opt/freesurfer/license.txt \
+    -B <path_to_subj_output_dir>:/output \
+    <path_to_image_dir>/freeqc_0.0.14.sif \
+    --subject <subj_label> --session ses-Template
+```
+_FreeQC jobs are launched by the script, `run_freeqc_on_templates.sh`_

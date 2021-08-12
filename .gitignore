@@ -5,3 +5,6 @@
 *images/
 *jobscripts/
 *tissueClasses.xlsx
+*.history*
+*.Rhistory
+*all_long_scans_oracle_cleaned.csv
