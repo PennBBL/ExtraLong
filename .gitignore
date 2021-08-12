@@ -3,5 +3,5 @@
 *~
 *.DS_Store*
 *images/
-*scripts/jobscripts/
+*jobscripts/
 *tissueClasses.xlsx
