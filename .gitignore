@@ -5,7 +5,7 @@
 *.vscode
 *.code-workspace
 *images/
-*scripts/jobscripts/
+*jobscripts/
 *tissueClasses.xlsx
 *.history*
 *.Rhistory
