@@ -3,6 +3,7 @@
 *~
 *.DS_Store*
 *.vscode
+*.code-workspace
 *images/
 *scripts/jobscripts/
 *tissueClasses.xlsx
