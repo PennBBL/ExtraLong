@@ -7,7 +7,7 @@ jsDir=~/ants_pipelines/data/scripts/jobscripts/antssst-0.1.0
 mkdir -p ${jsDir}
 
 fmriprep_dir=/project/ExtraLong/data/freesurferCrossSectional/fmriprep
-antssst_dir=~/ants_pipelines/data/singleSubjectTemplates/antssst-0.1.0
+antslong_dir=~/ants_pipelines/data/ANTsLongitudinal
 atlas_dir=~/ants_pipelines/data/mindboggleVsBrainCOLOR_Atlases
 
 gt_subs_csv=~/ants_pipelines/subjects_for_gt.csv
@@ -22,7 +22,7 @@ for subject in $subList; do
 	sessions=`cat ${exclude_csv} | grep ${subject} | grep FALSE | cut -d , -f 2 | cut -d \" -f 2`
         echo SESSIONS: $sessions
 
-        out_dir=${antssst_dir}/${subject}
+        out_dir=${antslong_dir}/subjects/${subject}
         mkdir -p ${out_dir}
 
         jobscript=${jsDir}/${subject}.sh
@@ -34,7 +34,7 @@ for subject in $subList; do
 		-B ${fmriprep_dir}/${subject}:/data/input/fmriprep \\
 		-B ${out_dir}:/data/output \\
 		-B ${atlas_dir}:/data/input/atlases \\
-		~/ants_pipelines/images/antssst_0.1.0.sif --seed 1 --jlf ${sessions}
+		~/ants_pipelines/images/antssst_0.1.0.sif --seed 1 ${sessions}
 
         JOBSCRIPT
 
