@@ -1,4 +1,4 @@
-# File:     heuristic_skeleton.py
+# File:     heuristic.py
 # Date:     09/14/2021
 # Desc:     BIDS curation heuristic for ExtraLong 2021.
 
@@ -34,7 +34,7 @@ keys = {}
 
 for proj in projects:
     keys[proj] = create_key(
-        "sub-{subject}/ses-{session}/anat/sub-{subject}_ses-{session}_acq-" + proj + "_T1w.nii.gz")
+        "sub-{subject}/ses-{session}/anat/sub-{subject}_ses-{session}_acq-" + proj + "_T1w")
 
 ################################################################################# 
 #######  Step 2: Define rules to map scans (based on their metadata) to  ########
