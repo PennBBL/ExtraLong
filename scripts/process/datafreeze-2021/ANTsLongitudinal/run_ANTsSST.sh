@@ -21,17 +21,17 @@ echo "ANTsSST will be run on $(echo $subList | wc -w) subjects"
 
 for subject in $subList; do
 
-  sessions=$(cat ${exclude_csv} | grep ${subject} | grep False | cut -d , -f 2 | sed "s/^/ses-/" | tr "\n" " ")
-  subject=sub-${subject}
-  echo SUBJECT: $subject
-  echo SESSIONS: $sessions
+    sessions=$(cat ${exclude_csv} | grep ${subject} | grep False | cut -d , -f 2 | sed "s/^/ses-/" | tr "\n" " ")
+    subject=sub-${subject}
+    echo SUBJECT: $subject
+    echo SESSIONS: $sessions
 
-  out_dir=${antslong_dir}/subjects/${subject}
-  mkdir -p ${out_dir}
+    out_dir=${antslong_dir}/subjects/${subject}
+    mkdir -p ${out_dir}
 
-  jobscript=${jsDir}/${subject}.sh
+    jobscript=${jsDir}/${subject}.sh
 
-  cat <<-JOBSCRIPT >${jobscript}
+    cat <<-JOBSCRIPT >${jobscript}
 		#!/bin/bash
 	
 		singularity run --writable-tmpfs --cleanenv --containall \\
@@ -42,7 +42,7 @@ for subject in $subList; do
 	
 	JOBSCRIPT
 
-  chmod +x ${jobscript}
-  bsub -e $LOGS_DIR/${subject}.e -o $LOGS_DIR/${subject}.o ${jobscript}
+    chmod +x ${jobscript}
+    bsub -e $LOGS_DIR/${subject}.e -o $LOGS_DIR/${subject}.o ${jobscript}
 
 done
