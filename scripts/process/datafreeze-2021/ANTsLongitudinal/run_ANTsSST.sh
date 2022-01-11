@@ -4,7 +4,7 @@ export LOGS_DIR=/home/kzoner/logs/ExtraLong_2021/ANTsSST-0.1.0
 mkdir -p ${LOGS_DIR}
 
 scripts="/project/ExtraLong/scripts/process/datafreeze-2021/ANTsLongitudinal"
-jsDir=${scripts}/jobscripts
+jsDir=${scripts}/jobscripts/ANTsSST-0.1.0
 mkdir -p ${jsDir}
 
 data="/project/ExtraLong/data/datafreeze-2021"
