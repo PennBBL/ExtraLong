@@ -9,7 +9,7 @@ fs_dir=${project}/data/datafreeze-2021/FreeSurfer
 freeqc_dir=${project}/data/datafreeze-2021/FreeQC
 mkdir -p $freeqc_dir
 
-js_dir=${project}/scripts/process/datafreeze-2021/FreeQC/jobscripts
+js_dir=${project}/scripts/datafreeze-2021/process/FreeQC/jobscripts
 mkdir -p $js_dir
 
 imgList=`ls $bids_dir/*/*/anat/*.nii.gz`

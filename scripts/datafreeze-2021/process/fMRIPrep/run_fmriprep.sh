@@ -8,7 +8,7 @@ input_dir=${project}/data/datafreeze-2021/bids_directory
 output_dir=${project}/data/datafreeze-2021/
 work_dir=${project}/data/datafreeze-2021/work
 fs_dir=${project}/data/datafreeze-2021/FreeSurfer
-js_dir=${project}/scripts/process/datafreeze-2021/fMRIPrep/jobscripts
+js_dir=${project}/scripts/datafreeze-2021/process/fMRIPrep/jobscripts
 templateflow=${project}/data/templateflow
 
 SIF=${project}/images/fmriprep_20.2.5.sif
