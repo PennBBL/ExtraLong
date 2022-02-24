@@ -7,7 +7,7 @@ mkdir -p $LOGS_DIR
 project=/project/ExtraLong
 input_dir=${project}/data/datafreeze-2021/bids_directory
 output_dir=${project}/data/datafreeze-2021/FreeSurfer
-js_dir=${project}/scripts/process/datafreeze-2021/FreeSurfer/jobscripts
+js_dir=${project}/scripts/datafreeze-2021/process/FreeSurfer/jobscripts/cross_sectional
 
 mkdir -p $js_dir
 
