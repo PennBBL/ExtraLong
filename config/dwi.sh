@@ -15,7 +15,7 @@ SCRATCH_DIR="${DWI_DIR}/scratch"
 JOBSCRIPT_DIR="${JOBSCRIPT_ROOT}/${WORKFLOW}"
 LOG_DIR="${LOG_ROOT}/${WORKFLOW}"
 
-CONTAINER="/appl/containers/qsiprep_1.1.1.sif"
+CONTAINER="${CONTAINER_DIR}/qsiprep_1.1.1.sif"
 LICENSE="${CODE_DIR}/freesurfer/assets/license.txt"
 
 TEMPLATEFLOW_HOME="${CODE_DIR}/${WORKFLOW}/assets/templateflow"
