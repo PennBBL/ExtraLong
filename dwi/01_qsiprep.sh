@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Set up
 set -euo pipefail
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
@@ -11,39 +12,86 @@ source "${code_root}/config/dwi.sh"
 script_name=$(basename "${BASH_SOURCE[0]}")
 script_stem="${script_name%.sh}"
 
-mkdir -p "${DATA_DIR}" "${TEMPLATEFLOW_HOME}" "${JOBSCRIPT_DIR}/${script_stem}" "${LOG_DIR}/${script_stem}"
+manifest="${JOBSCRIPT_DIR}/${script_stem}/manifest.txt"
+jobscript_path="${JOBSCRIPT_DIR}/${script_stem}/array.sh"
 
-find "${PROJECT_DIR}/dwi" -mindepth 1 -maxdepth 1 -type d -name "sub-*" -printf '%f\n' |
+mkdir -p \
+    "${DWI_DIR}" \
+    "${TEMPLATEFLOW_HOME}" \
+    "${JOBSCRIPT_DIR}/${script_stem}" \
+    "${LOG_DIR}/${script_stem}"
+
+# Create manifest of participants with dwi data
+find "${PROJECT_DIR}/dwi" \
+    -mindepth 1 \
+    -maxdepth 1 \
+    -type d \
+    -name "sub-*" \
+    -printf '%f\n' |
+sort |
 while read -r sub; do
 
-	dwi_dir=$(find "${PROJECT_DIR}/dwi/${sub}" -mindepth 3 -maxdepth 3 -type f -name "*_dwi.nii.gz")
-	[[ -n ${dwi_dir} ]] || continue
+    dwi_dir=$(
+        find "${PROJECT_DIR}/dwi/${sub}" \
+            -mindepth 3 \
+            -maxdepth 3 \
+            -type f \
+            -name "*_dwi.nii.gz" \
+            -print \
+            -quit
+    )
 
-    jobscript_path="${JOBSCRIPT_DIR}/${script_stem}/${sub}.sh"
+    [[ -n "${dwi_dir}" ]] || continue
 
-    cat <<-EOF > "${jobscript_path}"
+    printf '%s\n' "${sub}"
+
+done > "${manifest}"
+
+n_jobs=$(wc -l < "${manifest}")
+
+if (( n_jobs == 0 )); then
+    echo "No participants with DWI data found"
+    exit 0
+fi
+
+# Create array worker
+cat <<-EOF > "${jobscript_path}"
 	#!/usr/bin/env bash
-	#BSUB -J ${script_stem}_${sub}
+
+	#BSUB -J ${script_stem}[1-${n_jobs}]
 	#BSUB -n ${NTHREADS}
 	#BSUB -R "span[hosts=1]"
-	#BSUB -o ${LOG_DIR}/${script_stem}/${sub}.o
-	#BSUB -e ${LOG_DIR}/${script_stem}/${sub}.e
+	#BSUB -o ${LOG_DIR}/${script_stem}/%J_%I.o
+	#BSUB -e ${LOG_DIR}/${script_stem}/%J_%I.e
 
-	mkdir -p /scratch/\$USER/\$LSB_JOBID
-	trap 'echo "Cleaning /scratch/\$USER/\$LSB_JOBID"; rm -rf /scratch/\$USER/\$LSB_JOBID' EXIT
+	set -euo pipefail
+
+	manifest="${manifest}"
+
+	sub=\$(sed -n "\${LSB_JOBINDEX}p" "\${manifest}")
+
+	if [[ -z "\${sub}" ]]; then
+	    echo "No manifest entry for array index \${LSB_JOBINDEX}" >&2
+	    exit 1
+	fi
+
+	scratch="/scratch/\$USER/\${LSB_JOBID}_\${LSB_JOBINDEX}"
+
+	mkdir -p "\${scratch}"
+	trap 'echo "Cleaning \${scratch}"; rm -rf "\${scratch}"' EXIT
 
 	module load apptainer
 
 	apptainer run --containall \\
 	    --bind "${PROJECT_DIR}/dwi:/input:ro" \\
 	    --bind "${DWI_DIR}:/output" \\
-	    --bind "/scratch/\$USER/\$LSB_JOBID:/scratch" \\
+	    --bind "\${scratch}:/scratch" \\
 	    --bind "${LICENSE}:/license.txt:ro" \\
-	    --bind "${TEMPLATEFLOW_HOME}:/templateflow:ro" \\
+	    --bind "${TEMPLATEFLOW_HOME}:/templateflow" \\
 	    --env TEMPLATEFLOW_HOME="/templateflow" \\
 	    "${CONTAINER}" \\
 	    /input /output participant \\
-	    --participant-label ${sub} \\
+	    --participant-label "\${sub}" \\
 	    --output-resolution ${OUTPUT_RESOLUTION} \\
 	    --work-dir /scratch \\
 	    --dwi-only \\
@@ -52,9 +100,9 @@ while read -r sub; do
 	    --skip-bids-validation \\
 	    --nthreads ${NTHREADS} \\
 	    --omp-nthreads ${OMP_NTHREADS}
-	EOF
+EOF
 
-    chmod 775 "${jobscript_path}"
-    bsub < "${jobscript_path}"
+chmod 775 "${jobscript_path}"
 
-done
+# submit the job
+bsub < "${jobscript_path}"
