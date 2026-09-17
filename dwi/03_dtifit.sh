@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Set Up
 set -euo pipefail
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
@@ -11,47 +12,78 @@ source "${code_root}/config/dwi.sh"
 script_name=$(basename "${BASH_SOURCE[0]}")
 script_stem="${script_name%.sh}"
 
-mkdir -p "${JOBSCRIPT_DIR}/${script_stem}" "${LOG_DIR}/${script_stem}"
+manifest="${JOBSCRIPT_DIR}/${script_stem}/manifest.txt"
+jobscript_path="${JOBSCRIPT_DIR}/${script_stem}/array.sh"
 
-find "${DWI_DIR}" -mindepth 1 -maxdepth 1 -type d -name "sub-*" -printf '%f\n' |
-while read -r sub; do
+mkdir -p \
+    "${JOBSCRIPT_DIR}/${script_stem}" \
+    "${LOG_DIR}/${script_stem}"
 
-    find "${DWI_DIR}/${sub}" -mindepth 1 -maxdepth 1 -type d -name "ses-*" -printf '%f\n' |
-    while read -r ses; do
+# Create Manifest
+find "${DWI_DIR}" -mindepth 4 -maxdepth 4 -type f -name "sub-*_ses-*_space-ACPC_desc-pad_dwi.nii.gz" |
+while read -r dwi; do
 
-        path="${DWI_DIR}/${sub}/${ses}/dwi"
+    ses=$(basename "$(dirname "$(dirname "${dwi}")")")
+    sub=$(basename "$(dirname "$(dirname "$(dirname "${dwi}")")")")
 
-        dwi="${path}/${sub}_${ses}_space-ACPC_desc-pad_dwi.nii.gz"
-        mask="${path}/${sub}_${ses}_space-ACPC_desc-pad_mask.nii.gz"
-        bvals="${path}/${sub}_${ses}_space-ACPC_desc-preproc_dwi.bval"
-        bvecs="${path}/${sub}_${ses}_space-ACPC_desc-preproc_dwi.bvec"
-        out="${path}/${sub}_${ses}"
+    mask="${dwi/desc-pad_dwi.nii.gz/desc-pad_mask.nii.gz}"
+    bvals="${dwi/desc-pad_dwi.nii.gz/desc-preproc_dwi.bval}"
+    bvecs="${dwi/desc-pad_dwi.nii.gz/desc-preproc_dwi.bvec}"
 
-        [[ -f "${dwi}" &&
-           -f "${mask}" &&
-           -f "${bvals}" &&
-           -f "${bvecs}" ]] || continue
+    [[ -f "${mask}" && -f "${bvals}" && -f "${bvecs}" ]] || continue
 
-        jobscript_path="${JOBSCRIPT_DIR}/${script_stem}/${sub}_${ses}.sh"
+    printf '%s\t%s\n' "${sub}" "${ses}"
 
-		cat <<-EOF > "${jobscript_path}"
-		#!/usr/bin/env bash
-		#BSUB -J ${script_stem}_${sub}_${ses}
-		#BSUB -o ${LOG_DIR}/${script_stem}/${sub}_${ses}.o
-		#BSUB -e ${LOG_DIR}/${script_stem}/${sub}_${ses}.e
+done |
+sort > "${manifest}"
 
-		module load fsl/6.0.3
+n_jobs=$(wc -l < "${manifest}")
 
-		dtifit \\
-		    --data=${dwi} \\
-		    --out=${out} \\
-		    --mask=${mask} \\
-		    --bvecs=${bvecs} \\
-		    --bvals=${bvals}
-		EOF
+if (( n_jobs == 0 )); then
+    echo "No subject-session pairs with complete DWI inputs found"
+    exit 0
+fi
 
-        chmod 775 "${jobscript_path}"
-        bsub < "${jobscript_path}"
+# Create Array Worker
+cat <<-EOF > "${jobscript_path}"
+	#!/usr/bin/env bash
 
-    done
-done
+	#BSUB -J ${script_stem}[1-${n_jobs}]
+	#BSUB -o ${LOG_DIR}/${script_stem}/%J_%I.o
+	#BSUB -e ${LOG_DIR}/${script_stem}/%J_%I.e
+
+	set -euo pipefail
+
+	manifest="${manifest}"
+
+	IFS=\$'\t' read -r sub ses < <(
+	    sed -n "\${LSB_JOBINDEX}p" "\${manifest}"
+	)
+
+	if [[ -z "\${sub}" || -z "\${ses}" ]]; then
+	    echo "No manifest entry for array index \${LSB_JOBINDEX}" >&2
+	    exit 1
+	fi
+
+	module load fsl/6.0.7
+
+	ses_path="${DWI_DIR}/\${sub}/\${ses}/dwi"
+
+	dwi="\${ses_path}/\${sub}_\${ses}_space-ACPC_desc-pad_dwi.nii.gz"
+	mask="\${ses_path}/\${sub}_\${ses}_space-ACPC_desc-pad_mask.nii.gz"
+	bvals="\${ses_path}/\${sub}_\${ses}_space-ACPC_desc-preproc_dwi.bval"
+	bvecs="\${ses_path}/\${sub}_\${ses}_space-ACPC_desc-preproc_dwi.bvec"
+	out="\${ses_path}/\${sub}_\${ses}"
+
+	dtifit \\
+	    --data=\${dwi} \\
+	    --out=\${out} \\
+	    --mask=\${mask} \\
+	    --bvecs=\${bvecs} \\
+	    --bvals=\${bvals}
+EOF
+
+chmod 775 "${jobscript_path}"
+
+# Submit Job
+bsub < "${jobscript_path}"
