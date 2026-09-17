@@ -38,7 +38,7 @@ cat <<-EOF > "${jobscript_path}"
 #BSUB -e ${LOG_DIR}/${script_stem}.e
 
 module load dtitk/2.3.1
-module load fsl/6.0.3
+module load fsl/6.0.7
 
 cd "${BUILD_DIR}"
 

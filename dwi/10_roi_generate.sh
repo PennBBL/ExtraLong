@@ -30,7 +30,7 @@ cat <<-EOF > "${jobscript_path}"
 
 module load afni_openmp/20.1
 module load ANTs/2.3.5
-module load fsl/6.0.3
+module load fsl/6.0.7
 
 mkdir -p "${ATLAS_DIR}"
 mkdir -p "${ROI_DIR}"

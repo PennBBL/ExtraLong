@@ -27,7 +27,7 @@ while read -r sub; do
 		#BSUB -o ${LOG_DIR}/${script_stem}/${sub}_${ses}.o
 		#BSUB -e ${LOG_DIR}/${script_stem}/${sub}_${ses}.e
 
-		module load fsl/6.0.3
+		module load fsl/6.0.7
 
 		output="${STATS_DIR}/roi/${sub}_${ses}.csv"
 		echo "sub,ses,metric,atlas,region,value" > "\${output}"

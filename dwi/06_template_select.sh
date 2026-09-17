@@ -54,7 +54,7 @@ while read -r bin; do
 		#BSUB -o ${LOG_DIR}/${script_stem}/${bin}.o
 		#BSUB -e ${LOG_DIR}/${script_stem}/${bin}.e
 
-		module load fsl/6.0.3
+		module load fsl/6.0.7
 
 		cd ${bin_dir}
 

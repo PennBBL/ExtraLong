@@ -34,7 +34,7 @@ while read -r sub; do
 		#BSUB -e ${LOG_DIR}/${script_stem}/${sub}_${ses}.e
 
 		module load dtitk/2.3.1
-		module load fsl/6.0.3
+		module load fsl/6.0.7
 
 		dti_rigid_reg ${DWI_DIR}/template/template.nii.gz ${path}/${sub}_${ses}.nii.gz EDS 4 4 4 0.01
 		dti_affine_reg ${DWI_DIR}/template/template.nii.gz ${path}/${sub}_${ses}.nii.gz EDS 4 4 4 0.01 1

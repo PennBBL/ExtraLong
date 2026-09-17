@@ -1,5 +1,5 @@
 get_mean_projection_distance() {
-    module load fsl/6.0.3
+    module load fsl/6.0.7
 
     local scratch_base=""
     local fa_map=""
@@ -92,7 +92,7 @@ get_mean_projection_distance() {
 }
 
 get_volumes() {
-    module load fsl/6.0.3
+    module load fsl/6.0.7
     local image=""
 
     local options
@@ -132,8 +132,11 @@ get_volumes() {
 }
 
 get_tsnr_b0() {
-    module load fsl/6.0.3
+    module load fsl/6.0.7
     module load afni_openmp/20.1
+
+    local PATH="/project/bbl_projects/apps/melliott/scripts:${PATH}"
+    export PATH
 
     local scratch_base=""
     local raw=""
@@ -177,7 +180,7 @@ get_tsnr_b0() {
     scratch_dir=$(mktemp -d "${scratch_base}_XXXXXX")
 	trap 'rm -rf "${scratch_dir}"' RETURN
 
-    module load fsl/6.0.3
+    module load fsl/6.0.7
     module load afni_openmp/20.1
 
     ulimit -c 0
