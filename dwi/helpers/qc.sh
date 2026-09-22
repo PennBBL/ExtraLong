@@ -55,7 +55,7 @@ get_mean_projection_distance() {
     fi
 
     local scratch_dir
-    scratch_dir=$(mktemp -d "${scratch_base}_XXXXXX")
+    scratch_dir=$(mktemp -d "${scratch_base}/XXXXXX")
 	trap 'rm -rf "${scratch_dir}"' RETURN
 
     # get Proj Dist images
@@ -177,7 +177,7 @@ get_tsnr_b0() {
     fi
 
     local scratch_dir
-    scratch_dir=$(mktemp -d "${scratch_base}_XXXXXX")
+    scratch_dir=$(mktemp -d "${scratch_base}/XXXXXX")
 	trap 'rm -rf "${scratch_dir}"' RETURN
 
     module load fsl/6.0.7
@@ -185,9 +185,18 @@ get_tsnr_b0() {
 
     ulimit -c 0
 
-    mapfile -t niftis < <(find "${raw}" -mindepth 1 -maxdepth 1 -type f -name "*dwi.nii.gz")
-    mapfile -t bvals < <(find "${raw}" -mindepth 1 -maxdepth 1 -type f -name "*dwi.bval")
-    mapfile -t bvecs < <(find "${raw}" -mindepth 1 -maxdepth 1 -type f -name "*dwi.bvec")
+    mapfile -t niftis < <(
+        find "${raw}" -mindepth 1 -maxdepth 1 -type f -name "*dwi.nii.gz" |
+        sort
+    )
+    mapfile -t bvals < <(
+        find "${raw}" -mindepth 1 -maxdepth 1 -type f -name "*dwi.bval" |
+        sort
+    )
+    mapfile -t bvecs < <(
+        find "${raw}" -mindepth 1 -maxdepth 1 -type f -name "*dwi.bvec" |
+        sort
+    )
 
     if [[ "${#niftis[@]}" == 1 && "${#bvals[@]}" == 1 && "${#bvecs[@]}" == 1 ]]; then
         nifti="${niftis[0]}"
@@ -197,7 +206,7 @@ get_tsnr_b0() {
         nifti="${scratch_dir}/dwi.nii.gz"
         bval="${scratch_dir}/dwi.bval"
         bvec="${scratch_dir}/dwi.bvec"
-        fslmerge -t "${nifti}" "${nifti_inputs[@]}"
+        fslmerge -t "${nifti}" "${niftis[@]}"
         paste -d " " "${bvals[@]}" > "${bval}"
         paste -d " " "${bvecs[@]}" > "${bvec}"
     else
@@ -209,9 +218,12 @@ get_tsnr_b0() {
     "${bval}" \
     "${bvec}" \
     100 \
-    "${scratch_dir}/results.txt"
+    "${scratch_dir}/results.txt" >&2
 
     local tsnr_b0
     read -r _ tsnr_b0 < <(grep "tsnr_b0" "${scratch_dir}/results.txt")
+    if [[ "${tsnr_b0}" == "-1" ]]; then
+        tsnr_b0="n/a"
+    fi
     echo "${tsnr_b0}"
 }
