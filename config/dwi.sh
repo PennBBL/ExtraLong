@@ -28,6 +28,7 @@ OUTPUT_RESOLUTION=2
 
 RPI_EXECUTABLE="/project/bbl_projects/apps/melliott/scripts/force_RPI.sh"
 PAD_EXECUTABLE="${CODE_DIR}/${WORKFLOW}/helpers/pad.py"
+SELECT_EXECUTABLE="${CODE_DIR}/${WORKFLOW}/helpers/template_select.py"
 PAD_3D="24 24 15 15 21 22"
 PAD_4D="24 24 15 15 21 22 0 0"
 PAD_TEMPLATE="24 24 15 15 21 22 0 0 0 0"
