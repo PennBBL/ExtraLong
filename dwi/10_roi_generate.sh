@@ -12,7 +12,7 @@ source "${code_root}/config/dwi.sh"
 script_name=$(basename "${BASH_SOURCE[0]}")
 script_stem="${script_name%.sh}"
 
-jobscript_path="${JOBSCRIPT_DIR}/${script_stem}.sh"
+jobscript_path="${JOBSCRIPT_DIR}/${script_stem}/jobscript.sh"
 
 FSL_DIR="\${FSLDIR}/data/atlases/JHU"
 TARGET_FA="mean_FA.nii.gz"
@@ -21,7 +21,9 @@ ATLAS_TRACTS="JHU-ICBM-tracts-maxprob-thr25-2mm.nii.gz"
 ATLAS_LABELS="JHU-ICBM-labels-2mm.nii.gz"
 PAD="18 19 9 10 18 19"
 
-mkdir -p "${LOG_DIR}/${script_stem}"
+mkdir -p \
+    "${JOBSCRIPT_DIR}/${script_stem}" \
+    "${LOG_DIR}/${script_stem}"
 
 # Write Jobscript
 cat > "${jobscript_path}" <<EOF

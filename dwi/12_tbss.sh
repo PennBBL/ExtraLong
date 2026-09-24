@@ -12,9 +12,12 @@ source "${code_root}/config/dwi.sh"
 script_name=$(basename "${BASH_SOURCE[0]}")
 script_stem="${script_name%.sh}"
 
-jobscript_path="${JOBSCRIPT_DIR}/${script_stem}.sh"
+jobscript_path="${JOBSCRIPT_DIR}/${script_stem}/jobscript.sh"
 
-mkdir -p "${STATS_DIR}" "${LOG_DIR}/${script_stem}"
+mkdir -p \
+    "${STATS_DIR}" \
+    "${JOBSCRIPT_DIR}/${script_stem}" \
+    "${LOG_DIR}/${script_stem}"
 
 # Write Jobscript
 cat > "${jobscript_path}" <<EOF
