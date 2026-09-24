@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Set Up
 set -euo pipefail
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
@@ -11,15 +12,17 @@ source "${code_root}/config/dwi.sh"
 script_name=$(basename "${BASH_SOURCE[0]}")
 script_stem="${script_name%.sh}"
 
-mkdir -p "${STATS_DIR}" "${LOG_DIR}/${script_stem}"
-
 jobscript_path="${JOBSCRIPT_DIR}/${script_stem}.sh"
 
-cat <<-EOF > "${jobscript_path}"
+mkdir -p "${STATS_DIR}" "${LOG_DIR}/${script_stem}"
+
+# Write Jobscript
+cat > "${jobscript_path}" <<EOF
 #!/bin/bash
+
 #BSUB -J ${script_stem}
-#BSUB -o ${LOG_DIR}/${script_stem}/${script_stem}.o
-#BSUB -e ${LOG_DIR}/${script_stem}/${script_stem}.e
+#BSUB -o ${LOG_DIR}/${script_stem}/%J.o
+#BSUB -e ${LOG_DIR}/${script_stem}/%J.e
 
 module load dtitk/2.3.1
 module load fsl/6.0.7
@@ -44,5 +47,5 @@ for metric in AD MD RD; do
 done
 EOF
 
-chmod 775 "${jobscript_path}"
+# Submit Job
 bsub < "${jobscript_path}"

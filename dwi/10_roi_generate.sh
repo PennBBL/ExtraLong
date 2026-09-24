@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Set Up
 set -euo pipefail
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
@@ -11,8 +12,6 @@ source "${code_root}/config/dwi.sh"
 script_name=$(basename "${BASH_SOURCE[0]}")
 script_stem="${script_name%.sh}"
 
-mkdir -p "${LOG_DIR}/${script_stem}"
-
 jobscript_path="${JOBSCRIPT_DIR}/${script_stem}.sh"
 
 FSL_DIR="\${FSLDIR}/data/atlases/JHU"
@@ -22,8 +21,12 @@ ATLAS_TRACTS="JHU-ICBM-tracts-maxprob-thr25-2mm.nii.gz"
 ATLAS_LABELS="JHU-ICBM-labels-2mm.nii.gz"
 PAD="18 19 9 10 18 19"
 
-cat <<-EOF > "${jobscript_path}"
+mkdir -p "${LOG_DIR}/${script_stem}"
+
+# Write Jobscript
+cat > "${jobscript_path}" <<EOF
 #!/bin/bash
+
 #BSUB -J ${script_stem}
 #BSUB -o ${LOG_DIR}/${script_stem}/${script_stem}.o
 #BSUB -e ${LOG_DIR}/${script_stem}/${script_stem}.e
@@ -108,5 +111,5 @@ for atlas in "${ATLAS_TRACTS}" "${ATLAS_LABELS}"; do
 done
 EOF
 
-chmod 775 "${jobscript_path}"
+# Submit Job
 bsub < "${jobscript_path}"

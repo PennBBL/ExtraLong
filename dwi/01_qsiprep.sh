@@ -55,54 +55,66 @@ if (( n_jobs == 0 )); then
 fi
 
 # Create array worker
-cat <<-EOF > "${jobscript_path}"
-	#!/usr/bin/env bash
+cat > "${jobscript_path}" <<EOF
+#!/usr/bin/env bash
 
-	#BSUB -J ${script_stem}[1-${n_jobs}]
-	#BSUB -n ${NTHREADS}
-	#BSUB -R "span[hosts=1]"
-	#BSUB -o ${LOG_DIR}/${script_stem}/%J_%I.o
-	#BSUB -e ${LOG_DIR}/${script_stem}/%J_%I.e
+#BSUB -n ${NTHREADS}
+#BSUB -R "span[hosts=1]"
+#BSUB -o ${LOG_DIR}/${script_stem}/%J_%I.o
+#BSUB -e ${LOG_DIR}/${script_stem}/%J_%I.e
 
-	set -euo pipefail
+set -euo pipefail
 
-	manifest="${manifest}"
+manifest="${manifest}"
 
-	sub=\$(sed -n "\${LSB_JOBINDEX}p" "\${manifest}")
+sub=\$(sed -n "\${LSB_JOBINDEX}p" "\${manifest}")
 
-	if [[ -z "\${sub}" ]]; then
-	    echo "No manifest entry for array index \${LSB_JOBINDEX}" >&2
-	    exit 1
-	fi
+if [[ -z "\${sub}" ]]; then
+    echo "No manifest entry for array index \${LSB_JOBINDEX}" >&2
+    exit 1
+fi
 
-	scratch="/scratch/\$USER/\${LSB_JOBID}_\${LSB_JOBINDEX}"
+scratch="/scratch/\$USER/\${LSB_JOBID}_\${LSB_JOBINDEX}"
 
-	mkdir -p "\${scratch}"
-	trap 'echo "Cleaning \${scratch}"; rm -rf "\${scratch}"' EXIT
+mkdir -p "\${scratch}"
+trap 'echo "Cleaning \${scratch}"; rm -rf "\${scratch}"' EXIT
 
-	module load apptainer
+module load apptainer
 
-	apptainer run --containall \\
-	    --bind "${PROJECT_DIR}/dwi:/input:ro" \\
-	    --bind "${DWI_DIR}:/output" \\
-	    --bind "\${scratch}:/scratch" \\
-	    --bind "${LICENSE}:/license.txt:ro" \\
-	    --bind "${TEMPLATEFLOW_HOME}:/templateflow" \\
-	    --env TEMPLATEFLOW_HOME="/templateflow" \\
-	    "${CONTAINER}" \\
-	    /input /output participant \\
-	    --participant-label "\${sub}" \\
-	    --output-resolution ${OUTPUT_RESOLUTION} \\
-	    --work-dir /scratch \\
-	    --dwi-only \\
-	    --stop-on-first-crash \\
-	    --fs-license-file /license.txt \\
-	    --skip-bids-validation \\
-	    --nthreads ${NTHREADS} \\
-	    --omp-nthreads ${OMP_NTHREADS}
+apptainer run --containall \\
+    --bind "${PROJECT_DIR}/dwi:/input:ro" \\
+    --bind "${DWI_DIR}:/output" \\
+    --bind "\${scratch}:/scratch" \\
+    --bind "${LICENSE}:/license.txt:ro" \\
+    --bind "${TEMPLATEFLOW_HOME}:/templateflow" \\
+    --env TEMPLATEFLOW_HOME="/templateflow" \\
+    "${CONTAINER}" \\
+    /input /output participant \\
+    --participant-label "\${sub}" \\
+    --output-resolution ${OUTPUT_RESOLUTION} \\
+    --work-dir /scratch \\
+    --dwi-only \\
+    --stop-on-first-crash \\
+    --fs-license-file /license.txt \\
+    --skip-bids-validation \\
+    --nthreads ${NTHREADS} \\
+    --omp-nthreads ${OMP_NTHREADS}
 EOF
 
-chmod 775 "${jobscript_path}"
-
 # submit the job
-bsub < "${jobscript_path}"
+max_array_size=$(bparams -a | awk '/MAX_JOB_ARRAY_SIZE/ {print $NF}')
+
+if [[ ! "${max_array_size}" =~ ^[0-9]+$ ]]; then
+    echo "Could not determine MAX_JOB_ARRAY_SIZE" >&2
+    exit 1
+fi
+
+for (( start=1; start<=n_jobs; start+=max_array_size )); do
+    end=$(( start + max_array_size - 1 ))
+
+    if (( end > n_jobs )); then
+        end="${n_jobs}"
+    fi
+
+    bsub -J "${script_stem}[${start}-${end}]" < "${jobscript_path}"
+done
