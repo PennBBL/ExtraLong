@@ -48,8 +48,8 @@ fi
 cat > "${jobscript_path}" <<EOF
 #!/usr/bin/env bash
 
-#BSUB -o ${LOG_DIR}/${script_stem}/%J_%I.o
-#BSUB -e ${LOG_DIR}/${script_stem}/%J_%I.e
+#BSUB -o ${LOG_DIR}/${script_stem}/%I_%J.o
+#BSUB -e ${LOG_DIR}/${script_stem}/%I_%J.e
 
 set -euo pipefail
 

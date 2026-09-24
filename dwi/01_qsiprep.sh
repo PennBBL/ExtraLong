@@ -60,8 +60,8 @@ cat > "${jobscript_path}" <<EOF
 
 #BSUB -n ${NTHREADS}
 #BSUB -R "span[hosts=1]"
-#BSUB -o ${LOG_DIR}/${script_stem}/%J_%I.o
-#BSUB -e ${LOG_DIR}/${script_stem}/%J_%I.e
+#BSUB -o ${LOG_DIR}/${script_stem}/%I_%J.o
+#BSUB -e ${LOG_DIR}/${script_stem}/%I_%J.e
 
 set -euo pipefail
 

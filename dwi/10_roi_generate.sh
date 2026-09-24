@@ -28,8 +28,8 @@ cat > "${jobscript_path}" <<EOF
 #!/bin/bash
 
 #BSUB -J ${script_stem}
-#BSUB -o ${LOG_DIR}/${script_stem}/${script_stem}.o
-#BSUB -e ${LOG_DIR}/${script_stem}/${script_stem}.e
+#BSUB -o ${LOG_DIR}/${script_stem}/%J.o
+#BSUB -e ${LOG_DIR}/${script_stem}/%J.e
 
 module load afni_openmp/20.1
 module load ANTs/2.3.5
