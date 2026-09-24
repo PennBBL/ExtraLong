@@ -39,7 +39,7 @@ for file in "${SELECT_DIR}"/*/FA/best.msf; do
         continue
     fi
 
-    image_dtitk="${DATA_DIR}/${sub}/${ses}/dwi/${sub}_${ses}.nii.gz"
+    image_dtitk="${DWI_DIR}/${sub}/${ses}/dwi/${sub}_${ses}.nii.gz"
 
     cp "${image_dtitk}" "${BUILD_DIR}"
 done
@@ -59,6 +59,7 @@ cp "${INITIAL_TEMPLATE}" "${BUILD_DIR}/initial_template.nii.gz"
 cat > "${jobscript_path}" <<EOF
 #!/usr/bin/env bash
 
+#BSUB -J ${script_stem}
 #BSUB -o ${LOG_DIR}/${script_stem}/%J.o
 #BSUB -e ${LOG_DIR}/${script_stem}/%J.e
 
@@ -85,19 +86,4 @@ mv "template_mask.nii.gz" "${TEMPLATE_DIR}"
 EOF
 
 # Submit Job
-max_array_size=$(bparams -a | awk '/MAX_JOB_ARRAY_SIZE/ {print $NF}')
-
-if [[ ! "${max_array_size}" =~ ^[0-9]+$ ]]; then
-    echo "Could not determine MAX_JOB_ARRAY_SIZE" >&2
-    exit 1
-fi
-
-for (( start=1; start<=n_jobs; start+=max_array_size )); do
-    end=$(( start + max_array_size - 1 ))
-
-    if (( end > n_jobs )); then
-        end="${n_jobs}"
-    fi
-
-    bsub -J "${script_stem}[${start}-${end}]" < "${jobscript_path}"
-done
+bsub < "${jobscript_path}"
