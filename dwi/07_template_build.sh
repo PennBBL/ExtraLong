@@ -67,6 +67,7 @@ cat > "${jobscript_path}" <<EOF
 set -euo pipefail
 
 module load dtitk/2.3.1
+module load fsl/6.0.7
 
 cd "${BUILD_DIR}"
 
