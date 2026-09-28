@@ -14,12 +14,16 @@ script_stem="${script_name%.sh}"
 
 jobscript_path="${JOBSCRIPT_DIR}/${script_stem}/jobscript.sh"
 
+subjs="${BUILD_DIR}/subjs.txt"
 images_build="${TEMPLATE_DIR}/images_build.csv"
+
+i_rigid=3
+i_affine=3
 
 mkdir -p \
     "${JOBSCRIPT_DIR}/${script_stem}" \
     "${LOG_DIR}/${script_stem}" \
-    "${BUILD_DIR}" \
+    "${BUILD_DIR}"
 
 # Move Necessary Images to build_dir/
 csvcut -c dtitk_path "${images_build}" |
@@ -50,12 +54,9 @@ find "${BUILD_DIR}" \
     -type f \
     -name 'sub-*_ses-*.nii.gz' \
     -printf '%f\n' |
-    sort > "${SUBS_FILE}"
+    sort > "${subjs}"
 
-# Copy Initial Template
-cp "${INITIAL_TEMPLATE}" "${BUILD_DIR}/initial_template.nii.gz"
-
-# Write Jobscript
+# jobscript
 cat > "${jobscript_path}" <<EOF
 #!/usr/bin/env bash
 
@@ -66,23 +67,28 @@ cat > "${jobscript_path}" <<EOF
 set -euo pipefail
 
 module load dtitk/2.3.1
-module load fsl/6.0.7
 
 cd "${BUILD_DIR}"
 
-# MAKE THE TEMPLATE
+# Preprocess Existing Tensor Template
+cp "${INITIAL_TEMPLATE}" "initial_template.nii.gz"
 TVResample -in "initial_template.nii.gz" -align center -size 80 98 85 -vsize 2 2 2
 "${PAD_EXECUTABLE}" "initial_template.nii.gz" "initial_template.nii.gz" ${PAD_TEMPLATE}
 TVAdjustVoxelspace -in "initial_template.nii.gz" -origin 0 0 0
-dti_template_bootstrap "initial_template.nii.gz" "$(basename "${SUBS_FILE}")"
-mv "mean_initial.nii.gz" "template.nii.gz"
 
-# MAKE THE TEMPLATE MASK
-bet "template.nii.gz" "template_brain.nii.gz" -f 0.3 -m
-fslmaths "template_brain_mask.nii.gz" -Tmax -bin "template_mask.nii.gz" -odt char
+# Bootstrap Initial Template
+dti_template_bootstrap "initial_template.nii.gz" "${subjs##*/}"
 
-mv "template.nii.gz" "${TEMPLATE_DIR}"
-mv "template_mask.nii.gz" "${TEMPLATE_DIR}"
+# Rigid and Affine Registration
+dti_rigid_population "mean_initial.nii.gz" "${subjs##*/}" EDS ${i_rigid}
+dti_affine_population "mean_rigid${i_rigid}.nii.gz" "${subjs##*/}" EDS ${i_affine}
+
+# Create Mask of Affine Template
+TVtool -in "mean_affine${i_affine}.nii.gz" -tr
+BinaryThresholdImageFilter "mean_affine${i_affine}_tr.nii.gz" "mask.nii.gz" 0.01 100 1 0
+
+# Diffeomorphic Registration
+dti_diffeomorphic_population "mean_affine${i_affine}.nii.gz" "subjs_aff.txt" "mask.nii.gz" 0.002
 EOF
 
 # Submit Job
