@@ -90,6 +90,14 @@ BinaryThresholdImageFilter "mean_affine${i_affine}_tr.nii.gz" "mask.nii.gz" 0.01
 
 # Diffeomorphic Registration
 dti_diffeomorphic_population "mean_affine${i_affine}.nii.gz" "subjs_aff.txt" "mask.nii.gz" 0.002
+
+# Create Mask of Final Template
+TVtool -in "mean_diffeomorphic_initial6.nii.gz" -tr
+BinaryThresholdImageFilter "mean_diffeomorphic_initial6_tr.nii.gz" "mean_diffeomorphic_initial6_mask.nii.gz" 0.01 100 1 0
+
+# Copy Final Template and Mask
+cp "mean_diffeomorphic_initial6.nii.gz" "${TEMPLATE_DIR}/template.nii.gz"
+cp "mean_diffeomorphic_initial6_mask.nii.gz" "${TEMPLATE_DIR}/template_mask.nii.gz"
 EOF
 
 # Submit Job
