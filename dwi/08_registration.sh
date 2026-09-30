@@ -62,7 +62,6 @@ if [[ -z "\${sub}" || -z "\${ses}" ]]; then
 fi
 
 module load dtitk/2.3.1
-module load fsl/6.0.7
 
 path="${DWI_DIR}/\${sub}/\${ses}/dwi"
 
@@ -70,11 +69,6 @@ dti_rigid_reg ${DWI_DIR}/template/template.nii.gz \${path}/\${sub}_\${ses}.nii.g
 dti_affine_reg ${DWI_DIR}/template/template.nii.gz \${path}/\${sub}_\${ses}.nii.gz EDS 4 4 4 0.01 1
 dti_diffeomorphic_reg ${DWI_DIR}/template/template.nii.gz \${path}/\${sub}_\${ses}_aff.nii.gz ${DWI_DIR}/template/template_mask.nii.gz 1 6 0.002
 dti_warp_to_template \${path}/\${sub}_\${ses}.nii.gz ${DWI_DIR}/template/template.nii.gz 2 2 2
-TVtool -in \${path}/\${sub}_\${ses}_diffeo.nii.gz -fa
-TVtool -in \${path}/\${sub}_\${ses}_diffeo.nii.gz -eigs
-fslmaths \${path}/\${sub}_\${ses}_diffeo_lambda2.nii.gz -add \${path}/\${sub}_\${ses}_diffeo_lambda3.nii.gz -div 2 \${path}/\${sub}_\${ses}_diffeo_rd.nii.gz
-fslmaths \${path}/\${sub}_\${ses}_diffeo_lambda1.nii.gz -add \${path}/\${sub}_\${ses}_diffeo_lambda2.nii.gz -add \${path}/\${sub}_\${ses}_diffeo_lambda3.nii.gz -div 3 \${path}/\${sub}_\${ses}_diffeo_md.nii.gz
-cp \${path}/\${sub}_\${ses}_diffeo_lambda1.nii.gz \${path}/\${sub}_\${ses}_diffeo_ad.nii.gz
 EOF
 
 # Submit Job
