@@ -43,7 +43,6 @@ module load fsl/6.0.7
 TVMean -in ${STATS_DIR}/subs.txt -out ${STATS_DIR}/mean_tensor.nii.gz
 TVtool -in ${STATS_DIR}/mean_tensor.nii.gz -fa
 mv ${STATS_DIR}/mean_tensor_fa.nii.gz ${STATS_DIR}/mean_FA.nii.gz
-fslmaths ${STATS_DIR}/mean_FA.nii.gz -thr ${THRESHOLD} -bin ${STATS_DIR}/mean_FA_mask.nii.gz -odt char
 
 mapfile -t tensor_images < "${STATS_DIR}/subs.txt"
 
@@ -52,7 +51,7 @@ for metric in "AD" "FA" "MD" "RD"; do
     metric_images=()
 
     for image in "\${tensor_images[@]}"; do
-        metric_image="\${image%diffeo.nii.gz}diffeo_\${metric_lower}.nii.gz"
+        metric_image="\${image%.nii.gz}_\${metric_lower}.nii.gz"
 
         if [[ ! -f "\${metric_image}" ]]; then
             echo "Missing metric image: \${metric_image}" >&2
@@ -63,6 +62,7 @@ for metric in "AD" "FA" "MD" "RD"; do
     done
 
     fslmerge -t "${STATS_DIR}/all_\${metric}.nii.gz" "\${metric_images[@]}"
+done
 EOF
 
 #Submit Job
