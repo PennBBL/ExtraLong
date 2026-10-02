@@ -30,6 +30,13 @@ while read -r sub; do
 done |
 sort > "${manifest}"
 
+n_jobs=$(wc -l < "${manifest}")
+
+if (( n_jobs == 0 )); then
+    echo "No jobs found"
+    exit 0
+fi
+
 # Create Array Worker
 cat > "${jobscript_path}" <<EOF
 #!/usr/bin/env bash
