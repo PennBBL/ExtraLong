@@ -23,10 +23,13 @@ while read -r participant_id; do
     sort |
     while read -r session_id; do
 
+        fa_map="${DWI_DIR}/${participant_id}/${session_id}/dwi/${participant_id}_${session_id}_diffeo_fa.nii.gz"
+        [[ -f "${fa_map}" ]] || continue
+
         proj_dist=$(
             get_mean_projection_distance \
             --scratch "${SCRATCH_DIR}" \
-            --fa_map "${DWI_DIR}/${participant_id}/${session_id}/dwi/${participant_id}_${session_id}_diffeo_fa.nii.gz" \
+            --fa_map "${fa_map}" \
             --mean_fa "${STATS_DIR}/mean_FA.nii.gz" \
             --dst_map "${STATS_DIR}/mean_FA_skeleton_mask_dst.nii.gz" \
             --mask "${STATS_DIR}/mean_FA_skeleton_mask.nii.gz"
