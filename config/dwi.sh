@@ -1,0 +1,37 @@
+WORKFLOW="dwi"
+
+DWI_DIR="${DERIVATIVES_DIR}/${WORKFLOW}"
+
+STATS_DIR="${DWI_DIR}/stats"
+ATLAS_DIR="${DWI_DIR}/atlas"
+ROI_DIR="${ATLAS_DIR}/roi"
+TEMPLATE_DIR="${DWI_DIR}/template"
+BUILD_DIR="${TEMPLATE_DIR}/build"
+SELECT_DIR="${TEMPLATE_DIR}/select"
+QC_DIR="${DWI_DIR}/qc"
+SCRATCH_DIR="${DWI_DIR}/scratch"
+
+JOBSCRIPT_DIR="${JOBSCRIPT_ROOT}/${WORKFLOW}"
+LOG_DIR="${LOG_ROOT}/${WORKFLOW}"
+
+CONTAINER="${CONTAINER_DIR}/qsiprep_1.1.1.sif"
+LICENSE="${CODE_DIR}/freesurfer/assets/license.txt"
+
+TEMPLATEFLOW_HOME="${CODE_DIR}/${WORKFLOW}/assets/templateflow"
+INITIAL_TEMPLATE="${CODE_DIR}/data/go1_n14_template.nii.gz"
+
+NTHREADS=6
+OMP_NTHREADS=4
+
+OUTPUT_RESOLUTION=2
+
+RPI_EXECUTABLE="/project/bbl_projects/apps/melliott/scripts/force_RPI.sh"
+PAD_EXECUTABLE="${CODE_DIR}/${WORKFLOW}/helpers/pad.py"
+SELECT_EXECUTABLE="${CODE_DIR}/${WORKFLOW}/helpers/template_select.py"
+PAD_3D="24 24 15 15 21 22"
+PAD_4D="24 24 15 15 21 22 0 0"
+PAD_TEMPLATE="24 24 15 15 21 22 0 0 0 0"
+
+FACTOR=1000
+
+THRESHOLD=0.2
